@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TM-BOM Metro Map — CycloneDX 2.0</title>
+<link rel="icon" href="data:,">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f4f3ee;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  #header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: #2b2b3d;
+    color: #fff;
+    padding: 12px 24px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  #header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  #header .subtitle {
+    font-size: 12px;
+    color: #aaa;
+    margin-left: auto;
+  }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    margin-left: 32px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #ccc;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+    user-select: none;
+  }
+
+  .legend-item:hover {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+  }
+
+  .legend-item.active {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .legend-swatch {
+    width: 20px;
+    height: 5px;
+    border-radius: 3px;
+  }
+
+  #map-group polyline:not(#route-trail),
+  #map-group rect,
+  .station-dot,
+  .hub-circle,
+  .station-label {
+    transition: opacity 0.35s ease;
+  }
+
+  #map-container {
+    width: 100vw;
+    height: 100vh;
+    padding-top: 52px;
+    cursor: grab;
+    overflow: hidden;
+  }
+
+  #map-container.grabbing { cursor: grabbing; }
+
+  svg {
+    display: block;
+  }
+
+  /* Metro line styles */
+  .line-purple { stroke: #3b2d8e; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .line-orange { stroke: #d4721a; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .line-gray   { stroke: #6b6b6b; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .line-green  { stroke: #27ae60; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .line-teal   { stroke: #16a085; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .line-cyan   { stroke: #2980b9; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Station styles */
+  .station-dot {
+    cursor: pointer;
+  }
+
+  .station-dot .hit-area {
+    fill: transparent;
+    stroke: none;
+  }
+
+  .station-label {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .label-purple { fill: #3b2d8e; }
+  .label-orange { fill: #d4721a; }
+  .label-gray   { fill: #555; }
+  .label-green  { fill: #27ae60; }
+  .label-teal   { fill: #16a085; }
+  .label-cyan   { fill: #2980b9; }
+
+  .hub-circle {
+    cursor: pointer;
+  }
+
+  .hub-circle .hit-area {
+    fill: transparent;
+    stroke: none;
+  }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    background: #2b2b3d;
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 380px;
+    pointer-events: none;
+    display: none;
+    z-index: 200;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  #tooltip.visible { display: block; }
+
+  #tooltip .tt-title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+    border-bottom: 2px solid;
+    padding-bottom: 4px;
+  }
+
+  #tooltip .tt-line {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+
+  #tooltip .tt-props {
+    font-size: 12px;
+    color: #ccc;
+  }
+
+  #tooltip .tt-props span {
+    color: #ffd;
+    font-weight: 600;
+  }
+
+  /* Zoom controls */
+  #controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 100;
+  }
+
+  #controls button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #2b2b3d;
+    color: #fff;
+    font-size: 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #controls button:hover { background: #444; }
+
+  /* Route animation */
+  #route-btn { font-size: 11px; width: auto; padding: 0 10px; letter-spacing: 0.3px; }
+
+  @keyframes station-pulse {
+    0%   { transform: scale(1); opacity: 1; }
+    40%  { transform: scale(1.9); opacity: 0.85; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .station-active > circle:not(.hit-area),
+  .station-active > circle:nth-child(2) {
+    animation: station-pulse 0.8s ease-in-out;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+
+  .station-visited > circle:not(.hit-area) {
+    stroke-width: 4;
+  }
+
+  #phase-banner {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, rgba(43,43,61,0.0) 0%, rgba(43,43,61,0.95) 30%);
+    padding: 32px 32px 18px;
+    z-index: 150;
+    display: none;
+    align-items: flex-end;
+    gap: 20px;
+    color: #fff;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  #phase-banner.visible { display: flex; }
+
+  .phase-number {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1;
+    min-width: 50px;
+  }
+
+  .phase-info {
+    flex: 1;
+  }
+
+  .phase-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .phase-desc {
+    font-size: 13px;
+    color: #aab;
+  }
+
+  .phase-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .phase-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #555;
+    transition: background 0.3s, transform 0.3s;
+  }
+
+  .phase-dot.completed { background: #7f8; }
+  .phase-dot.current { background: #fff; transform: scale(1.4); }
+
+  .phase-advance {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .phase-advance:hover { background: rgba(255,255,255,0.25); }
+
+  /* Edit mode — draggable stations */
+  .edit-mode .station-dot, .edit-mode .hub-circle { cursor: grab; }
+  .edit-mode .station-dot.dragging, .edit-mode .hub-circle.dragging { cursor: grabbing; }
+  #edit-btn { font-size: 11px; width: auto; padding: 0 10px; letter-spacing: 0.3px; }
+  #edit-btn.active { background: #d4721a; color: #fff; }
+  #reset-layout-btn { font-size: 11px; width: auto; padding: 0 10px; letter-spacing: 0.3px; display: none; }
+  #controls.edit-mode-controls #reset-layout-btn { display: flex; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>Threat Modeling BOM — Metro Map</h1>
+  <div class="legend">
+    <div class="legend-item active" data-line="all">
+      <div class="legend-swatch" style="background:linear-gradient(90deg,#3b2d8e,#d4721a,#6b6b6b,#27ae60,#16a085,#2980b9);"></div>
+      All
+    </div>
+    <div class="legend-item" data-line="purple">
+      <div class="legend-swatch" style="background:#3b2d8e;"></div>
+      Threat Intelligence
+    </div>
+    <div class="legend-item" data-line="orange">
+      <div class="legend-swatch" style="background:#d4721a;"></div>
+      Threat Scenario
+    </div>
+    <div class="legend-item" data-line="gray">
+      <div class="legend-swatch" style="background:#6b6b6b;"></div>
+      Risk Management
+    </div>
+    <div class="legend-item" data-line="green">
+      <div class="legend-swatch" style="background:#27ae60;"></div>
+      Controls &amp; Mitigation
+    </div>
+    <div class="legend-item" data-line="teal">
+      <div class="legend-swatch" style="background:#16a085;"></div>
+      Requirements
+    </div>
+    <div class="legend-item" data-line="cyan">
+      <div class="legend-swatch" style="background:#2980b9;"></div>
+      System Model
+    </div>
+  </div>
+  <div class="subtitle">CycloneDX 2.0</div>
+</div>
+
+<div id="map-container">
+  <svg id="metro-svg" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Terminal cap markers -->
+      <marker id="cap-purple" markerWidth="8" markerHeight="8" refX="4" refY="4">
+        <rect x="1" y="0" width="6" height="8" rx="1" fill="#3b2d8e"/>
+      </marker>
+      <marker id="cap-orange" markerWidth="8" markerHeight="8" refX="4" refY="4">
+        <rect x="1" y="0" width="6" height="8" rx="1" fill="#d4721a"/>
+      </marker>
+      <marker id="cap-gray" markerWidth="8" markerHeight="8" refX="4" refY="4">
+        <rect x="1" y="0" width="6" height="8" rx="1" fill="#6b6b6b"/>
+      </marker>
+      <marker id="cap-red" markerWidth="8" markerHeight="8" refX="4" refY="4">
+        <rect x="1" y="0" width="6" height="8" rx="1" fill="#d4721a"/>
+      </marker>
+      <marker id="cap-green" markerWidth="8" markerHeight="8" refX="4" refY="4">
+        <rect x="1" y="0" width="6" height="8" rx="1" fill="#27ae60"/>
+      </marker>
+      <marker id="cap-teal" markerWidth="8" markerHeight="8" refX="4" refY="4">
+        <rect x="1" y="0" width="6" height="8" rx="1" fill="#16a085"/>
+      </marker>
+      <marker id="cap-cyan" markerWidth="8" markerHeight="8" refX="4" refY="4">
+        <rect x="1" y="0" width="6" height="8" rx="1" fill="#2980b9"/>
+      </marker>
+      <!-- Train glow filter -->
+      <filter id="train-glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <g id="map-group">
+      <!-- ============================================ -->
+      <!-- PURPLE LINES — Threat Intelligence           -->
+      <!-- ============================================ -->
+
+      <!-- Blueprint → Threat Model → Threat (horizontal) -->
+      <polyline points="200,360 350,360 620,360"
+                class="line-purple" stroke-width="8"/>
+
+      <!-- Threat → Kill Chain Phase -->
+      <polyline points="620,360 660,360 760,320"
+                class="line-purple" stroke-width="8"/>
+
+      <!-- Threat → CAPEC -->
+      <polyline points="620,360 640,330 740,270"
+                class="line-purple" stroke-width="8"/>
+
+      <!-- Threat → Vulnerabilities CVE -->
+      <polyline points="620,360 630,310 690,200"
+                class="line-purple" stroke-width="8"/>
+
+      <!-- Threat → Weakness CWE -->
+      <polyline points="620,360 610,290 520,140"
+                class="line-purple" stroke-width="8"/>
+
+      <!-- Kill Chain → Indicators -->
+      <polyline points="760,320 860,290 960,270"
+                class="line-purple" stroke-width="8"/>
+
+      <!-- ============================================ -->
+      <!-- CYAN LINES — System Model / Use Cases        -->
+      <!-- ============================================ -->
+
+      <!-- Blueprint → Assets -->
+      <polyline points="200,360 160,400 100,460"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Assets → Zones -->
+      <polyline points="100,460 90,510"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Zones → Boundaries -->
+      <polyline points="90,510 85,560"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Boundaries → Flows -->
+      <polyline points="85,560 90,610"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Flows → Use Cases -->
+      <polyline points="90,610 110,660"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Use Cases → Behaviors -->
+      <polyline points="110,660 140,710"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Behaviors → Blueprint Actors -->
+      <polyline points="140,710 155,735 170,760"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Blueprint → Assumptions (branch up-left) -->
+      <polyline points="200,360 160,325 120,290"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Assets → Data Stores (branch left) -->
+      <polyline points="100,460 50,475 0,490"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Data Stores → Data Sets (branch further left) -->
+      <polyline points="0,490 -35,505 -70,520"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Blueprint → Relationships (branch down-right) -->
+      <polyline points="200,360 230,395 260,430"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Attack Trees → Abuse Cases → Threat (approach from right) -->
+      <polyline points="960,380 880,380 780,370 620,360"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Threat → Attack Paths → Trust Boundaries (right and down) -->
+      <polyline points="620,360 720,400 820,440"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Trust Boundaries -->
+      <polyline points="820,440 920,470"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- ============================================ -->
+      <!-- ORANGE LINES — Threat Scenario Fan           -->
+      <!-- ============================================ -->
+
+      <!-- Threat hub → Actor (top fan line) -->
+      <polyline points="620,360 680,350 840,290 1010,240"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Actor → ThreatProfile 1 (branch from Actor) -->
+      <polyline points="1010,240 1130,270"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Threat hub → Attack Vector (lower-mid fan) -->
+      <polyline points="620,360 680,390 920,430 1220,430"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Threat hub → Exploitability (bottom fan) -->
+      <polyline points="620,360 680,410 920,480 1330,490"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Fan lines converging to Threat Scenario hub -->
+      <polyline points="620,360 580,420 540,490 540,590"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Threat Scenario → Methodologies (branch left-up) -->
+      <polyline points="540,590 480,570 430,550"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Threat Scenario → Likelihood -->
+      <polyline points="540,590 640,590 1220,540"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Threat Scenario → Impact -->
+      <polyline points="540,590 640,610 1270,610"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- ============================================ -->
+      <!-- GRAY LINES — Risk Management                 -->
+      <!-- ============================================ -->
+
+      <!-- Threat Scenario → Affected Assets (orange side of hub) -->
+      <polyline points="540,590 570,640 700,700"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Affected Assets → Risk hub -->
+      <polyline points="700,700 800,730 900,750"
+                class="line-gray" stroke-width="7"/>
+
+      <!-- Threat Scenario → Risk Score (orange — schema: threatScenario.riskScore) -->
+      <polyline points="540,590 640,640 1010,720"
+                class="line-orange" stroke-width="7"/>
+
+      <!-- Risk hub → Inherent Risk -->
+      <polyline points="900,750 1010,760"
+                class="line-gray" stroke-width="7"/>
+
+      <!-- Risk hub → Residual Risk -->
+      <polyline points="900,750 1010,800"
+                class="line-gray" stroke-width="7"/>
+
+      <!-- Risk hub → Target Risk -->
+      <polyline points="900,750 960,800 1010,840"
+                class="line-gray" stroke-width="7"/>
+
+      <!-- Risk hub → Risk Response -->
+      <polyline points="900,750 950,810 1050,860"
+                class="line-gray" stroke-width="7"/>
+
+      <!-- Risk hub → Assessment -->
+      <polyline points="900,750 830,810 780,870"
+                class="line-gray" stroke-width="7"/>
+
+      <!-- ============================================ -->
+      <!-- GREEN LINES — Controls & Mitigation          -->
+      <!-- ============================================ -->
+
+      <!-- Risk Response → Control hub -->
+      <polyline points="1050,860 1150,880 1260,900"
+                class="line-green" stroke-width="7"/>
+
+      <!-- Control hub → Effectiveness -->
+      <polyline points="1260,900 1370,870"
+                class="line-green" stroke-width="7"/>
+
+      <!-- Control hub → Applies To (branch left) -->
+      <polyline points="1260,900 1210,920 1160,940"
+                class="line-green" stroke-width="7"/>
+
+      <!-- Control hub → Implemented By (branch left-down) -->
+      <polyline points="1260,900 1200,950 1150,990"
+                class="line-green" stroke-width="7"/>
+
+      <!-- ============================================ -->
+      <!-- TEAL LINES — Requirements & Governance       -->
+      <!-- ============================================ -->
+
+      <!-- Control hub → Satisfies -->
+      <polyline points="1260,900 1280,950"
+                class="line-teal" stroke-width="7"/>
+
+      <!-- Satisfies → Requirements -->
+      <polyline points="1280,950 1300,1000"
+                class="line-teal" stroke-width="7"/>
+
+      <!-- Requirements → Acceptance Criteria -->
+      <polyline points="1300,1000 1320,1050"
+                class="line-teal" stroke-width="7"/>
+
+
+      <!-- ============================================ -->
+      <!-- TERMINAL STATIONS (end-of-line caps)         -->
+      <!-- ============================================ -->
+
+      <!-- Purple terminals -->
+      <rect x="510" y="132" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Weakness CWE -->
+      <rect x="680" y="192" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Vulns CVE -->
+      <rect x="732" y="262" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- CAPEC -->
+      <rect x="753" y="312" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Kill Chain -->
+      <rect x="952" y="262" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Indicators -->
+
+      <!-- Cyan terminals -->
+      <rect x="112" y="282" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Assumptions -->
+      <rect x="-8" y="482" width="10" height="16" rx="2" fill="#2980b9"/>    <!-- Data Stores -->
+      <rect x="-78" y="512" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Data Sets -->
+      <rect x="252" y="422" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Relationships -->
+      <rect x="162" y="752" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Blueprint Actors -->
+
+      <!-- Red terminals -->
+      <rect x="952" y="372" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Trees -->
+      <rect x="872" y="372" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Abuse Cases -->
+      <rect x="812" y="432" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Paths -->
+      <rect x="912" y="462" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Trust Boundaries -->
+
+      <!-- Orange terminals -->
+      <rect x="422" y="542" width="10" height="16" rx="2" fill="#d4721a"/>   <!-- Methodologies -->
+      <rect x="1122" y="262" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- ThreatProfile 1 -->
+      <!-- ThreatProfile 2 removed (duplicate) -->
+      <rect x="1212" y="422" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Vector -->
+      <rect x="1322" y="482" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Exploitability -->
+      <rect x="1212" y="532" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Likelihood -->
+      <rect x="1262" y="602" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Impact -->
+
+      <!-- Gray terminals -->
+      <!-- Affected Assets is now a hub — no terminal cap -->
+      <rect x="1002" y="712" width="10" height="16" rx="2" fill="#d4721a"/> <!-- Risk Score -->
+      <rect x="1002" y="752" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Inherent Risk -->
+      <rect x="1002" y="792" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Residual Risk -->
+      <rect x="1002" y="832" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Target Risk -->
+      <rect x="1042" y="852" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Risk Response -->
+      <rect x="770" y="862" width="10" height="16" rx="2" fill="#6b6b6b"/>  <!-- Assessment -->
+
+      <!-- Green terminals -->
+      <rect x="1362" y="862" width="10" height="16" rx="2" fill="#27ae60"/> <!-- Effectiveness -->
+      <!-- Mitigations removed (not a schema object; threat.mitigations is a ref-link to controls) -->
+      <rect x="1152" y="932" width="10" height="16" rx="2" fill="#27ae60"/> <!-- Applies To -->
+      <rect x="1142" y="982" width="10" height="16" rx="2" fill="#27ae60"/> <!-- Implemented By -->
+
+      <!-- Teal terminals -->
+      <rect x="1292" y="992" width="10" height="16" rx="2" fill="#16a085"/> <!-- Requirements -->
+      <rect x="1312" y="1042" width="10" height="16" rx="2" fill="#16a085"/> <!-- Acceptance Criteria -->
+
+
+      <!-- ============================================ -->
+      <!-- STATION DOTS                                 -->
+      <!-- ============================================ -->
+
+      <!-- Purple stations -->
+      <g class="station-dot" data-station="threatModel">
+        <circle class="hit-area" cx="350" cy="360" r="20"/>
+        <circle cx="350" cy="360" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="killChain">
+        <circle class="hit-area" cx="760" cy="320" r="20"/>
+        <circle cx="760" cy="320" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="capec">
+        <circle class="hit-area" cx="740" cy="270" r="20"/>
+        <circle cx="740" cy="270" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="vulnerabilities">
+        <circle class="hit-area" cx="690" cy="200" r="20"/>
+        <circle cx="690" cy="200" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="weakness">
+        <circle class="hit-area" cx="520" cy="140" r="20"/>
+        <circle cx="520" cy="140" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="indicators">
+        <circle class="hit-area" cx="960" cy="270" r="20"/>
+        <circle cx="960" cy="270" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
+      </g>
+
+      <!-- Cyan stations (System Model) -->
+      <g class="station-dot" data-station="assumptions">
+        <circle class="hit-area" cx="120" cy="290" r="20"/>
+        <circle cx="120" cy="290" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="assets">
+        <circle class="hit-area" cx="100" cy="460" r="20"/>
+        <circle cx="100" cy="460" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="dataStores">
+        <circle class="hit-area" cx="0" cy="490" r="20"/>
+        <circle cx="0" cy="490" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="dataSets">
+        <circle class="hit-area" cx="-70" cy="520" r="20"/>
+        <circle cx="-70" cy="520" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="relationships">
+        <circle class="hit-area" cx="260" cy="430" r="20"/>
+        <circle cx="260" cy="430" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="zones">
+        <circle class="hit-area" cx="90" cy="510" r="20"/>
+        <circle cx="90" cy="510" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="boundaries">
+        <circle class="hit-area" cx="85" cy="560" r="20"/>
+        <circle cx="85" cy="560" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="flows">
+        <circle class="hit-area" cx="90" cy="610" r="20"/>
+        <circle cx="90" cy="610" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="useCases">
+        <circle class="hit-area" cx="110" cy="660" r="20"/>
+        <circle cx="110" cy="660" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="behaviors">
+        <circle class="hit-area" cx="140" cy="710" r="20"/>
+        <circle cx="140" cy="710" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="blueprintActors">
+        <circle class="hit-area" cx="170" cy="760" r="20"/>
+        <circle cx="170" cy="760" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+
+      <!-- Orange stations (Attack Modeling, merged) -->
+      <g class="station-dot" data-station="attackTrees">
+        <circle class="hit-area" cx="960" cy="380" r="20"/>
+        <circle cx="960" cy="380" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="abuseCases">
+        <circle class="hit-area" cx="880" cy="380" r="20"/>
+        <circle cx="880" cy="380" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="attackPaths">
+        <circle class="hit-area" cx="820" cy="440" r="20"/>
+        <circle cx="820" cy="440" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="trustBoundaries">
+        <circle class="hit-area" cx="920" cy="470" r="20"/>
+        <circle cx="920" cy="470" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+
+      <!-- Orange stations -->
+      <g class="station-dot" data-station="methodologies">
+        <circle class="hit-area" cx="430" cy="550" r="20"/>
+        <circle cx="430" cy="550" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="actor">
+        <circle class="hit-area" cx="1010" cy="240" r="20"/>
+        <circle cx="1010" cy="240" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="threatProfile">
+        <circle class="hit-area" cx="1130" cy="270" r="20"/>
+        <circle cx="1130" cy="270" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <!-- threatProfile2 removed (merged into threatProfile) -->
+      <g class="station-dot" data-station="attackVector">
+        <circle class="hit-area" cx="1220" cy="430" r="20"/>
+        <circle cx="1220" cy="430" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="exploitability">
+        <circle class="hit-area" cx="1330" cy="490" r="20"/>
+        <circle cx="1330" cy="490" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="likelihood">
+        <circle class="hit-area" cx="1220" cy="540" r="20"/>
+        <circle cx="1220" cy="540" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="impact">
+        <circle class="hit-area" cx="1270" cy="610" r="20"/>
+        <circle cx="1270" cy="610" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+
+      <!-- Gray stations (Risk Management) -->
+      <!-- Affected Assets Hub (Scenario → Risk) -->
+      <g class="hub-circle" data-station="affectedAssets">
+        <circle class="hit-area" cx="700" cy="700" r="24"/>
+        <circle cx="700" cy="700" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
+        <circle cx="700" cy="700" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="riskScore">
+        <circle class="hit-area" cx="1010" cy="720" r="20"/>
+        <circle cx="1010" cy="720" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="inherentRisk">
+        <circle class="hit-area" cx="1010" cy="760" r="20"/>
+        <circle cx="1010" cy="760" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="residualRisk">
+        <circle class="hit-area" cx="1010" cy="800" r="20"/>
+        <circle cx="1010" cy="800" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="targetRisk">
+        <circle class="hit-area" cx="1010" cy="840" r="20"/>
+        <circle cx="1010" cy="840" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="riskResponse">
+        <circle class="hit-area" cx="1050" cy="860" r="20"/>
+        <circle cx="1050" cy="860" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="assessment">
+        <circle class="hit-area" cx="780" cy="870" r="20"/>
+        <circle cx="780" cy="870" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
+      </g>
+
+      <!-- Green stations (Controls & Mitigation) -->
+      <g class="station-dot" data-station="effectiveness">
+        <circle class="hit-area" cx="1370" cy="870" r="20"/>
+        <circle cx="1370" cy="870" r="6" fill="#fff" stroke="#27ae60" stroke-width="3" pointer-events="none"/>
+      </g>
+      <!-- mitigations station removed -->
+      <g class="station-dot" data-station="appliesTo">
+        <circle class="hit-area" cx="1160" cy="940" r="20"/>
+        <circle cx="1160" cy="940" r="6" fill="#fff" stroke="#27ae60" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="implementedBy">
+        <circle class="hit-area" cx="1150" cy="990" r="20"/>
+        <circle cx="1150" cy="990" r="6" fill="#fff" stroke="#27ae60" stroke-width="3" pointer-events="none"/>
+      </g>
+
+      <!-- Teal stations (Requirements) -->
+      <g class="station-dot" data-station="satisfies">
+        <circle class="hit-area" cx="1280" cy="950" r="20"/>
+        <circle cx="1280" cy="950" r="6" fill="#fff" stroke="#16a085" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="requirements">
+        <circle class="hit-area" cx="1300" cy="1000" r="20"/>
+        <circle cx="1300" cy="1000" r="6" fill="#fff" stroke="#16a085" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="acceptanceCriteria">
+        <circle class="hit-area" cx="1320" cy="1050" r="20"/>
+        <circle cx="1320" cy="1050" r="6" fill="#fff" stroke="#16a085" stroke-width="3" pointer-events="none"/>
+      </g>
+
+      <!-- ============================================ -->
+      <!-- HUB STATIONS (interchange circles)           -->
+      <!-- ============================================ -->
+
+      <!-- Blueprint Hub (Purple + Cyan) -->
+      <g class="hub-circle" data-station="blueprint">
+        <circle class="hit-area" cx="200" cy="360" r="24"/>
+        <circle cx="200" cy="360" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
+        <circle cx="200" cy="360" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
+      </g>
+
+      <!-- Threat Hub (Purple + Orange + Red) -->
+      <g class="hub-circle" data-station="threat">
+        <circle class="hit-area" cx="620" cy="360" r="24"/>
+        <circle cx="620" cy="360" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
+        <circle cx="620" cy="360" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
+      </g>
+
+      <!-- Threat Scenario Hub (Orange + Gray) -->
+      <g class="hub-circle" data-station="threatScenario">
+        <circle class="hit-area" cx="540" cy="590" r="24"/>
+        <circle cx="540" cy="590" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
+        <circle cx="540" cy="590" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
+      </g>
+
+      <!-- Risk Hub (Gray + Green) -->
+      <g class="hub-circle" data-station="risk">
+        <circle class="hit-area" cx="900" cy="750" r="24"/>
+        <circle cx="900" cy="750" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
+        <circle cx="900" cy="750" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
+      </g>
+
+      <!-- Control Hub (Green + Teal) -->
+      <g class="hub-circle" data-station="control">
+        <circle class="hit-area" cx="1260" cy="900" r="24"/>
+        <circle cx="1260" cy="900" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
+        <circle cx="1260" cy="900" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
+      </g>
+
+      <!-- ============================================ -->
+      <!-- STATION LABELS                               -->
+      <!-- ============================================ -->
+
+      <!-- Hub labels -->
+      <text x="200" y="340" text-anchor="middle" class="station-label" style="font-size:14px; fill:#222;">Blueprint</text>
+      <text x="620" y="340" text-anchor="middle" class="station-label" style="font-size:14px; fill:#222;">Threat</text>
+      <text x="525" y="575" text-anchor="end" class="station-label" style="font-size:14px; fill:#222;">
+        <tspan x="515" dy="0">Threat</tspan>
+        <tspan x="515" dy="15">Scenario</tspan>
+      </text>
+      <text x="900" y="735" text-anchor="middle" class="station-label" style="font-size:14px; fill:#222;">Risk</text>
+      <text x="1260" y="885" text-anchor="middle" class="station-label" style="font-size:14px; fill:#222;">Control</text>
+
+      <!-- Purple labels -->
+      <text x="350" y="390" text-anchor="middle" class="station-label label-purple">
+        <tspan x="350" dy="0">Threat</tspan>
+        <tspan x="350" dy="15">Model</tspan>
+      </text>
+      <text x="520" y="125" text-anchor="middle" class="station-label label-purple">
+        <tspan x="520" dy="0">Weakness</tspan>
+        <tspan x="520" dy="14">(CWE)</tspan>
+      </text>
+      <text x="690" y="180" text-anchor="middle" class="station-label label-purple">
+        <tspan x="690" dy="0">Vulnerabilities</tspan>
+        <tspan x="690" dy="14">(CVE)</tspan>
+      </text>
+      <text x="750" y="255" text-anchor="start" class="station-label label-purple">CAPEC</text>
+      <text x="775" y="315" text-anchor="start" class="station-label label-purple">
+        <tspan x="775" dy="0">Kill Chain</tspan>
+        <tspan x="775" dy="14">Phase</tspan>
+      </text>
+      <text x="975" y="265" text-anchor="start" class="station-label label-purple">Indicators</text>
+
+      <!-- Cyan labels (System Model) -->
+      <text x="105" y="280" text-anchor="end" class="station-label label-cyan">Assumptions</text>
+      <text x="75" y="458" text-anchor="end" class="station-label label-cyan">Assets</text>
+      <text x="-15" y="488" text-anchor="end" class="station-label label-cyan">Data Stores</text>
+      <text x="-85" y="518" text-anchor="end" class="station-label label-cyan">Data Sets</text>
+      <text x="275" y="428" text-anchor="start" class="station-label label-cyan">Relationships</text>
+      <text x="65" y="508" text-anchor="end" class="station-label label-cyan">Zones</text>
+      <text x="60" y="558" text-anchor="end" class="station-label label-cyan">Boundaries</text>
+      <text x="65" y="615" text-anchor="end" class="station-label label-cyan">Flows</text>
+      <text x="85" y="658" text-anchor="end" class="station-label label-cyan">Use Cases</text>
+      <text x="115" y="708" text-anchor="end" class="station-label label-cyan">Behaviors</text>
+      <text x="145" y="758" text-anchor="end" class="station-label label-cyan">
+        <tspan x="150" dy="0">Blueprint</tspan>
+        <tspan x="150" dy="14">Actors</tspan>
+      </text>
+
+      <!-- Orange labels (Attack Modeling, merged) -->
+      <text x="960" y="400" text-anchor="middle" class="station-label label-orange">
+        <tspan x="960" dy="0">Attack</tspan>
+        <tspan x="960" dy="14">Trees</tspan>
+      </text>
+      <text x="880" y="400" text-anchor="middle" class="station-label label-orange">
+        <tspan x="880" dy="0">Abuse</tspan>
+        <tspan x="880" dy="14">Cases</tspan>
+      </text>
+      <text x="805" y="455" text-anchor="middle" class="station-label label-orange" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
+        <tspan x="805" dy="0">Attack</tspan>
+        <tspan x="805" dy="14">Paths</tspan>
+      </text>
+      <text x="935" y="465" text-anchor="start" class="station-label label-orange">
+        <tspan x="935" dy="0">Trust</tspan>
+        <tspan x="935" dy="14">Boundaries</tspan>
+      </text>
+
+      <!-- Orange labels -->
+      <text x="415" y="545" text-anchor="end" class="station-label label-orange">Methodologies</text>
+      <text x="1010" y="228" text-anchor="middle" class="station-label label-orange">Actor</text>
+      <text x="1140" y="260" text-anchor="start" class="station-label label-orange">
+        <tspan x="1140" dy="0">Threat</tspan>
+        <tspan x="1140" dy="14">Profile</tspan>
+      </text>
+      <text x="1235" y="425" text-anchor="start" class="station-label label-orange">
+        <tspan x="1235" dy="0">Attack</tspan>
+        <tspan x="1235" dy="14">Vector</tspan>
+      </text>
+      <text x="1345" y="485" text-anchor="start" class="station-label label-orange">Exploitability</text>
+      <text x="1235" y="535" text-anchor="start" class="station-label label-orange">Likelihood</text>
+      <text x="1285" y="608" text-anchor="start" class="station-label label-orange">Impact</text>
+
+      <!-- Gray labels (Risk Management) -->
+      <text x="680" y="685" text-anchor="middle" class="station-label" style="font-size:14px; fill:#222;" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
+        <tspan x="680" dy="0">Affected</tspan>
+        <tspan x="680" dy="14">Assets</tspan>
+      </text>
+      <text x="1025" y="715" text-anchor="start" class="station-label label-orange">
+        <tspan x="1025" dy="0">Risk</tspan>
+        <tspan x="1025" dy="14">Score</tspan>
+      </text>
+      <text x="1025" y="755" text-anchor="start" class="station-label label-gray">
+        <tspan x="1025" dy="0">Inherent</tspan>
+        <tspan x="1025" dy="14">Risk</tspan>
+      </text>
+      <text x="1025" y="795" text-anchor="start" class="station-label label-gray">
+        <tspan x="1025" dy="0">Residual</tspan>
+        <tspan x="1025" dy="14">Risk</tspan>
+      </text>
+      <text x="1025" y="835" text-anchor="start" class="station-label label-gray">
+        <tspan x="1025" dy="0">Target</tspan>
+        <tspan x="1025" dy="14">Risk</tspan>
+      </text>
+      <text x="1065" y="855" text-anchor="start" class="station-label label-gray">
+        <tspan x="1065" dy="0">Risk</tspan>
+        <tspan x="1065" dy="14">Response</tspan>
+      </text>
+      <text x="780" y="895" text-anchor="middle" class="station-label label-gray">Assessment</text>
+
+      <!-- Green labels (Controls) -->
+      <text x="1385" y="865" text-anchor="start" class="station-label label-green">Effectiveness</text>
+      <!-- mitigations label removed -->
+      <text x="1145" y="935" text-anchor="end" class="station-label label-green">Applies To</text>
+      <text x="1135" y="988" text-anchor="end" class="station-label label-green">
+        <tspan x="1135" dy="0">Implemented</tspan>
+        <tspan x="1135" dy="14">By</tspan>
+      </text>
+
+      <!-- Teal labels (Requirements) -->
+      <text x="1295" y="948" text-anchor="start" class="station-label label-teal">Satisfies</text>
+      <text x="1315" y="998" text-anchor="start" class="station-label label-teal">Requirements</text>
+      <text x="1335" y="1048" text-anchor="start" class="station-label label-teal">
+        <tspan x="1335" dy="0">Acceptance</tspan>
+        <tspan x="1335" dy="14">Criteria</tspan>
+      </text>
+
+      <!-- ============================================ -->
+      <!-- CROSS-LINE CONNECTORS (schema refs)         -->
+      <!-- ============================================ -->
+
+      <!-- blueprint.requirements — cyan dashed to teal Requirements -->
+      <polyline points="200,360 280,520 500,740 800,900 1100,970 1300,1000"
+                stroke="#2980b9" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- threat.mitigations — refs from threats to controls -->
+      <polyline points="620,360 800,580 1050,800 1260,900"
+                stroke="#27ae60" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- threat.behaviors — purple dashed to cyan Behaviors -->
+      <polyline points="620,360 380,540 140,710"
+                stroke="#3b2d8e" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- ============================================ -->
+      <!-- ROUTE ANIMATION OVERLAY                     -->
+      <!-- ============================================ -->
+      <g id="route-overlay" style="display:none;">
+        <polyline id="route-trail" points="" fill="none" stroke="#fff" stroke-width="5" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle id="train-glow-ring" cx="0" cy="0" r="16" fill="none" stroke="#fff" stroke-width="2" stroke-opacity="0.3" filter="url(#train-glow)"/>
+        <circle id="train-dot" cx="0" cy="0" r="8" fill="#fff" filter="url(#train-glow)"/>
+      </g>
+
+    </g>
+  </svg>
+</div>
+
+<div id="tooltip">
+  <div class="tt-line"></div>
+  <div class="tt-title"></div>
+  <div class="tt-props"></div>
+</div>
+
+<div id="phase-banner">
+  <div class="phase-number" id="phase-num">1</div>
+  <div class="phase-info">
+    <div class="phase-title" id="phase-title">Know Your System</div>
+    <div class="phase-desc" id="phase-desc">Press → or click Next to advance</div>
+  </div>
+  <div class="phase-dots" id="phase-dots">
+    <div class="phase-dot"></div>
+    <div class="phase-dot"></div>
+    <div class="phase-dot"></div>
+    <div class="phase-dot"></div>
+    <div class="phase-dot"></div>
+    <div class="phase-dot"></div>
+    <div class="phase-dot"></div>
+  </div>
+  <button class="phase-advance" id="phase-next">Next →</button>
+</div>
+
+<div id="controls">
+  <button id="edit-btn" title="Toggle edit mode to drag stations">✎ Edit</button>
+  <button id="reset-layout-btn" title="Reset all stations to original positions">↺ Reset</button>
+  <button id="route-btn" title="Play presentation route">▶ Route</button>
+  <button id="zoom-in" title="Zoom in">+</button>
+  <button id="zoom-out" title="Zoom out">−</button>
+  <button id="zoom-reset" title="Reset view">⟲</button>
+</div>
+
+<script>
+const stationData = {
+  // ── Purple — Threat Intelligence ──────────────────
+  blueprint: {
+    title: "Blueprint",
+    line: "Hub — System Model / Threat Intelligence",
+    color: "#222",
+    desc: "System architecture model — defines assets, zones, boundaries, flows, actors, data stores, relationships, and assumptions that form the attack surface. Hub connecting the system model (cyan) to threat intelligence (purple).",
+    props: ["name", "modelTypes", "assets", "zones", "boundaries", "flows", "actors", "dataStores", "dataSets", "relationships", "assumptions"],
+    example: "E-commerce platform with payment gateway, user database, CDN, and third-party shipping API"
+  },
+  threatModel: {
+    title: "Threat Model",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
+    desc: "The overarching threat model referencing the blueprint scope and enumerating identified threats.",
+    props: ["name", "description", "scope", "methodology"],
+    example: "STRIDE analysis of the checkout flow covering payment, authentication, and order services"
+  },
+  threat: {
+    title: "Threat",
+    line: "Hub — Intelligence / Scenario",
+    color: "#222",
+    desc: "A specific threat to the system. Hub connecting threat intelligence (purple) and threat scenarios (orange).",
+    props: ["name", "origin", "categories (STRIDE, LINDDUN, MAESTRO, MITRE ATT&CK)", "source"],
+    example: "SQL injection in product search allowing data exfiltration (STRIDE: Tampering, Information Disclosure)"
+  },
+  weakness: {
+    title: "Weakness (CWE)",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
+    desc: "Common Weakness Enumeration — a category of software/hardware weakness that can lead to vulnerabilities.",
+    props: ["cweId", "description"],
+    example: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+  },
+  vulnerabilities: {
+    title: "Vulnerabilities (CVE)",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
+    desc: "Known vulnerabilities (CVE) in components that a threat may exploit.",
+    props: ["id (CVE)", "source", "ratings", "advisories", "affects"],
+    example: "CVE-2023-34362: MOVEit Transfer SQL injection vulnerability (CVSS 9.8)"
+  },
+  capec: {
+    title: "CAPEC",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
+    desc: "Common Attack Pattern Enumeration & Classification — standardized descriptions of attack methods.",
+    props: ["capecId", "attackPattern", "relatedWeaknesses"],
+    example: "CAPEC-66: SQL Injection — manipulating query logic via user-supplied input parameters"
+  },
+  killChain: {
+    title: "Kill Chain Phase",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
+    desc: "Stage in the cyber kill chain: from reconnaissance through actions-on-objectives.",
+    props: ["reconnaissance", "weaponization", "delivery", "exploitation", "installation", "C2", "actions-on-objectives"],
+    example: "Exploitation — attacker delivers SQL payload through the product search field"
+  },
+  indicators: {
+    title: "Indicators",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
+    desc: "Indicators of Compromise (IoC), Indicators of Attack (IoA), and detection signatures associated with threats.",
+    props: ["type (IoC/IoA/signature)", "value", "pattern", "source", "confidence"],
+    example: "IoC: Unusual outbound data transfer volume to unknown IP; IoA: repeated UNION SELECT in query logs"
+  },
+
+  // ── Cyan — System Model / Use Cases ───────────────
+  assumptions: {
+    title: "Assumptions",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Security assumptions underpinning the blueprint — conditions believed true that, if violated, invalidate the threat model.",
+    props: ["name", "description", "condition", "impact", "owner", "validationStatus"],
+    example: "All API traffic is encrypted via TLS 1.3; the CDN provider does not cache authenticated responses"
+  },
+  assets: {
+    title: "Assets",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Blueprint asset inventory — components, services, and data stores that comprise the system under analysis.",
+    props: ["name", "type (component/service/data)", "classification", "owner", "value"],
+    example: "PostgreSQL user database containing PII for 2M customers; Payment Service (Node.js microservice)"
+  },
+  dataStores: {
+    title: "Data Stores",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Storage systems within the blueprint — databases, file systems, caches — with classification, placements, owners, and authorization policies.",
+    props: ["name", "type", "classification", "placements", "owners", "authorization"],
+    example: "Amazon RDS (PostgreSQL) — stores customer profiles, orders, and payment tokens; Redis cache for sessions"
+  },
+  dataSets: {
+    title: "Data Sets",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Data classification objects distinct from storage — representing data-level sensitivity, ownership, and authorization requirements.",
+    props: ["name", "classification", "owners", "authorization", "retentionPolicy", "sensitivity"],
+    example: "Customer PII dataset — names, emails, addresses, phone numbers (classified: Confidential, retention: 7 years)"
+  },
+  relationships: {
+    title: "Relationships",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Structural relationships between blueprint assets — aggregation, dependency, realization, and service relationships.",
+    props: ["type (aggregates/dependsOn/realizes/serves)", "source", "target", "description"],
+    example: "Payment Service dependsOn Auth Service for JWT token validation; Order Service serves Web Frontend"
+  },
+  zones: {
+    title: "Zones",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Trust and network zones that partition the system architecture into distinct security domains.",
+    props: ["name", "trustLevel", "networkSegment", "assets", "classification"],
+    example: "DMZ — public-facing web servers and load balancers (trust level: Low); Internal — microservices and databases (trust level: High)"
+  },
+  boundaries: {
+    title: "Boundaries",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Zone boundaries where data or control crosses between trust levels, requiring security enforcement.",
+    props: ["name", "fromZone", "toZone", "crossingRequirements", "controls"],
+    example: "DMZ → Internal: requires mTLS, WAF inspection, input validation, and rate limiting"
+  },
+  flows: {
+    title: "Flows",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Data and control flows between assets, describing communication paths and data movement across the system.",
+    props: ["name", "source", "destination", "protocol", "dataClassification", "crossesBoundaries"],
+    example: "HTTPS POST /api/checkout → Payment Service → Stripe API (carries PCI card data, crosses DMZ→Internal boundary)"
+  },
+  useCases: {
+    title: "Use Cases",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "System use cases describing intended functionality — the legitimate counterpart to abuse cases.",
+    props: ["name", "actor", "preconditions", "mainFlow", "postconditions", "requirements"],
+    example: "Customer places order: browses catalog, adds items to cart, enters payment details, receives order confirmation"
+  },
+  behaviors: {
+    title: "Behaviors",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Behavioral models describing system reactions — triggers, state graphs, and response sequences.",
+    props: ["name", "triggers", "stateGraph", "guards", "actions"],
+    example: "On payment failure: retry 3x with exponential backoff, then notify user, log event, and alert ops"
+  },
+  blueprintActors: {
+    title: "Blueprint Actors",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "System-level actor definitions within the blueprint — users, services, and external systems that interact with the architecture, independent of threat scenarios.",
+    props: ["name", "type (human/system/external)", "zone", "permissions", "interfaces"],
+    example: "Authenticated Customer — web/mobile access, limited to own account data; Admin — internal zone, full CRUD"
+  },
+
+  // ── Orange — Attack Modeling (merged into Threat Scenario) ──
+  attackTrees: {
+    title: "Attack Trees",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "AND/OR decomposition of attack goals into sub-goals, representing structured threat analysis.",
+    props: ["goal", "operator (AND/OR)", "children", "likelihood", "cost", "difficulty"],
+    example: "Goal: Exfiltrate customer PII — OR(SQL injection in search, API parameter tampering, compromised admin credentials)"
+  },
+  abuseCases: {
+    title: "Abuse Cases",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "Adversarial counterpart to use cases — describes how an attacker misuses system functionality.",
+    props: ["name", "abuser", "targets", "mainFlow", "preconditions", "consequences"],
+    example: "Attacker abuses product search by injecting UNION SELECT to dump user table via error messages"
+  },
+  attackPaths: {
+    title: "Attack Paths",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "Chained multi-step attack sequences from source to destination, including boundary crossings.",
+    props: ["name", "source", "destination", "steps", "boundaryCrossings", "prerequisites"],
+    example: "SQLi in search → extract DB credentials → direct DB connection → bulk PII exfiltration (crosses DMZ→Internal)"
+  },
+  trustBoundaries: {
+    title: "Trust Boundaries",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "Annotated trust boundary definitions with trust levels, associated threats, and protective controls.",
+    props: ["name", "trustLevel", "threats", "controls", "assets", "crossingPolicy"],
+    example: "Internet → DMZ boundary: WAF required, input validation enforced, DDoS protection active"
+  },
+
+  // ── Orange — Threat Scenario ──────────────────────
+  methodologies: {
+    title: "Methodologies",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "Threat modeling methodologies applied to the scenario — STRIDE, LINDDUN, MAESTRO, PASTA, VAST, or custom frameworks.",
+    props: ["name", "type (STRIDE/LINDDUN/MAESTRO/PASTA/VAST/custom)", "scope", "coverage"],
+    example: "STRIDE applied to checkout data flow; MITRE ATT&CK mapped for detection coverage analysis"
+  },
+  actor: {
+    title: "Actor",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "The party (human or system) acting in a threat scenario — references a party defined in definitions.parties (distinct from blueprint actors).",
+    props: ["party (ref)", "description", "permissions", "zone"],
+    example: "External attacker — unauthenticated, operating from the Internet zone, no existing permissions"
+  },
+  threatProfile: {
+    title: "Threat Profile",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "Reusable profile describing the durable characteristics of an actor that may pose a threat — sophistication, resources, and skill set.",
+    props: ["name", "description", "sophistication", "resources", "skillSet"],
+    example: "APT-level profile: Sophistication: Advanced; Resources: Government-backed; Skill set: zero-day exploit development, custom C2 frameworks"
+  },
+  attackVector: {
+    title: "Attack Vector",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "How the attack is delivered — network context, complexity, required privileges, and scope change.",
+    props: ["type (network/adjacent/local/physical)", "complexity", "privileges", "userInteraction", "scope"],
+    example: "Network-based, Low complexity, No privileges required, No user interaction needed"
+  },
+  exploitability: {
+    title: "Exploitability",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "Maturity and feasibility of exploiting the threat — from theoretical to weaponized.",
+    props: ["level", "complexity", "skillRequired", "automatable"],
+    example: "Weaponized — public exploit available (sqlmap), fully automatable, low skill required"
+  },
+  threatScenario: {
+    title: "Threat Scenario",
+    line: "Hub — Scenario / Risk",
+    color: "#222",
+    desc: "A concrete scenario combining a threat with actor, vector, and assessed likelihood/impact. Hub linking threat analysis to risk assessment.",
+    props: ["name", "threats", "actor", "threatProfile", "attackVector", "exploitability", "likelihood", "impact", "riskScore", "affectedAssets"],
+    example: "External attacker exploits SQL injection in product search to extract 2M customer PII records via blind injection"
+  },
+  likelihood: {
+    title: "Likelihood",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "Probability assessment of the scenario occurring — qualitative level, numeric score, or statistical probability.",
+    props: ["level (very-low → certain)", "score", "probability", "frequency", "factors"],
+    example: "High (score: 8/10) — public exploit exists, internet-facing endpoint, high-value target for attackers"
+  },
+  impact: {
+    title: "Impact",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "Severity of consequences if the scenario materializes — across confidentiality, integrity, availability, and more.",
+    props: ["level (negligible → catastrophic)", "categories", "score", "factors", "quantification"],
+    example: "Critical — 2M customer records exposed, estimated $4.5M regulatory fines, severe reputational damage"
+  },
+
+  // ── Gray — Risk Management ────────────────────────
+  affectedAssets: {
+    title: "Affected Assets",
+    line: "Hub — Scenario / Risk",
+    color: "#222",
+    desc: "Components, services, or data stores impacted by this threat scenario.",
+    props: ["component refs", "service refs", "data refs"],
+    example: "User database (PostgreSQL), Search Service API, Customer PII dataset"
+  },
+  risk: {
+    title: "Risk",
+    line: "Hub — Risk / Controls",
+    color: "#222",
+    desc: "The formal risk object connecting risk ratings to responses and controls. Hub linking risk management (gray) to controls & mitigation (green).",
+    props: ["name", "statement", "riskScore", "inherentRisk", "residualRisk", "targetRisk", "responses", "status"],
+    example: "RISK-007: Customer data breach via SQL injection — Inherent: Critical, Residual: Medium, Target: Low"
+  },
+  riskScore: {
+    title: "Risk Score",
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "Quantified risk rating using a chosen methodology — combines likelihood and impact into a single assessment.",
+    props: ["level (info → critical)", "score", "vector", "methodology (DREAD, FAIR, OWASP, etc.)"],
+    example: "OWASP Risk Rating: Critical (Likelihood: High x Impact: Critical = 9.2/10)"
+  },
+  inherentRisk: {
+    title: "Inherent Risk",
+    line: "Risk Management",
+    color: "#6b6b6b",
+    desc: "Pre-control risk rating — the risk level before any mitigating controls are applied.",
+    props: ["level", "score", "vector", "methodology", "justification"],
+    example: "Critical (9.2) — before parameterized queries, WAF, or input validation are deployed"
+  },
+  residualRisk: {
+    title: "Residual Risk",
+    line: "Risk Management",
+    color: "#6b6b6b",
+    desc: "Post-control risk rating — the risk level remaining after mitigating controls are applied.",
+    props: ["level", "score", "vector", "methodology", "justification"],
+    example: "Medium (4.1) — after WAF rules and parameterized queries applied; stored procedures still uncovered"
+  },
+  targetRisk: {
+    title: "Target Risk",
+    line: "Risk Management",
+    color: "#6b6b6b",
+    desc: "The desired risk level after planned controls are fully implemented — the third tier of the risk rating model alongside inherent and residual risk.",
+    props: ["level", "score", "vector", "methodology", "justification", "targetDate"],
+    example: "Low (2.0) — target after adding runtime SQL monitoring, input fuzzing, and stored procedure migration"
+  },
+  riskResponse: {
+    title: "Risk Response",
+    line: "Risk Management",
+    color: "#6b6b6b",
+    desc: "Strategy for addressing identified risk — avoid, reduce, transfer, or accept — with linked controls.",
+    props: ["strategy (avoid/reduce/transfer/accept)", "controls", "owner", "deadline", "status"],
+    example: "Reduce — deploy parameterized queries (Sprint 12), WAF rules (Sprint 13), runtime SQL monitoring (Sprint 15)"
+  },
+  assessment: {
+    title: "Assessment",
+    line: "Risk Management",
+    color: "#6b6b6b",
+    desc: "Formal risk assessment with defined scope, cadence, methodology, and recommendations.",
+    props: ["name", "scope", "methodology", "cadence", "findings", "recommendations"],
+    example: "Q3 2026 Application Security Review — scope: all public-facing APIs; finding: 3 SQLi vectors in search service"
+  },
+
+  // ── Green — Controls & Mitigation ─────────────────
+  control: {
+    title: "Control",
+    line: "Hub — Controls / Requirements",
+    color: "#222",
+    desc: "A security control that mitigates threats. Hub connecting controls & mitigation (green) to requirements & governance (teal).",
+    props: ["name", "type (preventive/detective/corrective)", "implementation", "appliesTo", "effectiveness"],
+    example: "CTL-019: Parameterized database queries — preventive control applied to all services querying PostgreSQL"
+  },
+  effectiveness: {
+    title: "Effectiveness",
+    line: "Controls & Mitigation",
+    color: "#27ae60",
+    desc: "Measured effectiveness of a security control — how well it reduces risk in practice.",
+    props: ["rating (high/medium/low)", "evidence", "lastAssessed", "coverageGaps"],
+    example: "High (92%) — blocks all known SQLi patterns in DAST scan; gap: legacy stored procedures not yet covered"
+  },
+  appliesTo: {
+    title: "Applies To",
+    line: "Controls & Mitigation",
+    color: "#27ae60",
+    desc: "Links a control back to the blueprint assets, zones, or boundaries it protects — where the control is enforced.",
+    props: ["control", "assetRefs", "zoneRefs", "boundaryRefs", "scope"],
+    example: "CTL-019 applies to all API endpoints in Payment Service and Search Service that query PostgreSQL — scope: production + staging"
+  },
+  implementedBy: {
+    title: "Implemented By",
+    line: "Controls & Mitigation",
+    color: "#27ae60",
+    desc: "The components or services that implement a control — the concrete technical realization of a security measure.",
+    props: ["control", "componentRefs", "serviceRefs", "configuration", "version"],
+    example: "CTL-019 implemented by ORM layer (Prisma v5.2) enforcing parameterized queries; AWS WAF rule set v3.2 blocking SQLi patterns"
+  },
+
+  // ── Teal — Requirements & Governance ──────────────
+  satisfies: {
+    title: "Satisfies",
+    line: "Requirements & Governance",
+    color: "#16a085",
+    desc: "The control-to-requirement link — traces which requirements a control satisfies, enabling compliance and coverage tracking.",
+    props: ["control", "requirementRefs", "coverageLevel", "evidence"],
+    example: "CTL-019 (parameterized queries) satisfies REQ-SEC-04 (injection prevention) — coverage: full, evidence: SAST + DAST reports"
+  },
+  requirements: {
+    title: "Requirements",
+    line: "Requirements & Governance",
+    color: "#16a085",
+    desc: "Security and functional requirements that controls must satisfy — referenced by risk, control, blueprint, and use cases.",
+    props: ["name", "type (security/functional/compliance)", "priority", "source", "satisfiedBy"],
+    example: "REQ-SEC-04: All database queries must use parameterized statements — Priority: Critical, Source: OWASP ASVS 5.3.4, Status: Approved"
+  },
+  acceptanceCriteria: {
+    title: "Acceptance Criteria",
+    line: "Requirements & Governance",
+    color: "#16a085",
+    desc: "Verifiable conditions that prove a requirement has been met — the testable definition of done.",
+    props: ["requirement", "condition", "testMethod", "evidence", "status (pass/fail/pending)"],
+    example: "PASS: Static analysis confirms 0 raw SQL strings in codebase; DAST scan finds 0 SQLi vectors across 47 endpoints"
+  }
+};
+
+// ─── Pan & Zoom ───────────────────────────────────────
+const svgElement = document.getElementById('metro-svg');
+const mapGroup = document.getElementById('map-group');
+const container = document.getElementById('map-container');
+
+let viewBox = { x: -150, y: 60, w: 1700, h: 1100 };
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+let viewBoxStart = { x: 0, y: 0 };
+
+function applyViewBox() {
+  svgElement.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+}
+
+function resizeSvg() {
+  svgElement.setAttribute('width', window.innerWidth);
+  svgElement.setAttribute('height', window.innerHeight - 52);
+  applyViewBox();
+}
+
+window.addEventListener('resize', resizeSvg);
+resizeSvg();
+
+container.addEventListener('mousedown', (e) => {
+  if (e.target.closest('.station-dot, .hub-circle')) return;
+  isPanning = true;
+  container.classList.add('grabbing');
+  panStart = { x: e.clientX, y: e.clientY };
+  viewBoxStart = { x: viewBox.x, y: viewBox.y };
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!isPanning) return;
+  const scaleFactorX = viewBox.w / svgElement.clientWidth;
+  const scaleFactorY = viewBox.h / svgElement.clientHeight;
+  viewBox.x = viewBoxStart.x - (e.clientX - panStart.x) * scaleFactorX;
+  viewBox.y = viewBoxStart.y - (e.clientY - panStart.y) * scaleFactorY;
+  applyViewBox();
+});
+
+window.addEventListener('mouseup', () => {
+  isPanning = false;
+  container.classList.remove('grabbing');
+});
+
+container.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const zoomFactor = e.deltaY > 0 ? 1.08 : 0.92;
+  const rect = svgElement.getBoundingClientRect();
+  const mouseXRatio = (e.clientX - rect.left) / rect.width;
+  const mouseYRatio = (e.clientY - rect.top) / rect.height;
+
+  const newW = viewBox.w * zoomFactor;
+  const newH = viewBox.h * zoomFactor;
+
+  viewBox.x += (viewBox.w - newW) * mouseXRatio;
+  viewBox.y += (viewBox.h - newH) * mouseYRatio;
+  viewBox.w = newW;
+  viewBox.h = newH;
+  applyViewBox();
+}, { passive: false });
+
+document.getElementById('zoom-in').addEventListener('click', () => {
+  const zoomFactor = 0.85;
+  const centerX = viewBox.x + viewBox.w / 2;
+  const centerY = viewBox.y + viewBox.h / 2;
+  viewBox.w *= zoomFactor;
+  viewBox.h *= zoomFactor;
+  viewBox.x = centerX - viewBox.w / 2;
+  viewBox.y = centerY - viewBox.h / 2;
+  applyViewBox();
+});
+
+document.getElementById('zoom-out').addEventListener('click', () => {
+  const zoomFactor = 1.18;
+  const centerX = viewBox.x + viewBox.w / 2;
+  const centerY = viewBox.y + viewBox.h / 2;
+  viewBox.w *= zoomFactor;
+  viewBox.h *= zoomFactor;
+  viewBox.x = centerX - viewBox.w / 2;
+  viewBox.y = centerY - viewBox.h / 2;
+  applyViewBox();
+});
+
+document.getElementById('zoom-reset').addEventListener('click', () => {
+  viewBox = { x: -50, y: 60, w: 1600, h: 1100 };
+  applyViewBox();
+});
+
+// ─── Tooltips (debounced hide to prevent flicker) ─────
+const tooltip = document.getElementById('tooltip');
+let hideTimer = null;
+let activeStation = null;
+
+function showTooltip(stationInfo, e) {
+  if (mapGroup.classList.contains('edit-mode')) return;
+  clearTimeout(hideTimer);
+  activeStation = stationInfo;
+
+  tooltip.querySelector('.tt-line').textContent = stationInfo.line;
+  tooltip.querySelector('.tt-line').style.color = stationInfo.color;
+  tooltip.querySelector('.tt-title').textContent = stationInfo.title;
+  tooltip.querySelector('.tt-title').style.borderColor = stationInfo.color;
+  let tooltipContent = stationInfo.desc + '<br><br><span>Schema props:</span> ' + stationInfo.props.join(', ');
+  if (stationInfo.example) {
+    tooltipContent += '<br><br><span>Example:</span> ' + stationInfo.example;
+  }
+  tooltip.querySelector('.tt-props').innerHTML = tooltipContent;
+
+  positionTooltip(e);
+  tooltip.classList.add('visible');
+}
+
+function positionTooltip(e) {
+  const tooltipWidth = 380;
+  const offset = 20;
+  let leftPosition = e.clientX + offset;
+  if (leftPosition + tooltipWidth > window.innerWidth) {
+    leftPosition = e.clientX - tooltipWidth - offset;
+  }
+  let topPosition = e.clientY + offset;
+  if (topPosition + 200 > window.innerHeight) {
+    topPosition = e.clientY - 200;
+  }
+  tooltip.style.left = leftPosition + 'px';
+  tooltip.style.top = topPosition + 'px';
+}
+
+function scheduleHide() {
+  hideTimer = setTimeout(() => {
+    tooltip.classList.remove('visible');
+    activeStation = null;
+  }, 120);
+}
+
+document.querySelectorAll('.station-dot, .hub-circle').forEach(stationElement => {
+  const stationKey = stationElement.dataset.station;
+  const stationInfo = stationData[stationKey];
+  if (!stationInfo) return;
+
+  stationElement.addEventListener('mouseenter', (e) => showTooltip(stationInfo, e));
+  stationElement.addEventListener('mousemove', (e) => positionTooltip(e));
+  stationElement.addEventListener('mouseleave', () => scheduleHide());
+});
+
+// ─── Route Animation ─────────────────────────────────
+const routePhases = [
+  {
+    phaseNumber: 1,
+    title: "Know Your System",
+    desc: "Blueprint defines the system architecture — assets, zones, flows, and actors",
+    color: "#2980b9",
+    waypoints: [[200,360]],
+    branchStations: ["assumptions","assets","dataStores","dataSets","relationships","zones","boundaries","flows","useCases","behaviors","blueprintActors"]
+  },
+  {
+    phaseNumber: 2,
+    title: "Catalog the Threats",
+    desc: "Threat intelligence — weaknesses, vulnerabilities, attack patterns, kill chain",
+    color: "#3b2d8e",
+    waypoints: [[200,360],[350,360],[620,360]],
+    branchStations: ["weakness","vulnerabilities","capec","killChain","indicators"]
+  },
+  {
+    phaseNumber: 3,
+    title: "Model the Attacks",
+    desc: "Structured attack analysis — trees, abuse cases, paths, trust boundaries",
+    color: "#d4721a",
+    waypoints: [[620,360]],
+    branchStations: ["attackTrees","abuseCases","attackPaths","trustBoundaries"]
+  },
+  {
+    phaseNumber: 4,
+    title: "Build Scenarios",
+    desc: "Concrete threat scenarios — actors, vectors, exploitability, likelihood, impact",
+    color: "#d4721a",
+    waypoints: [[620,360],[580,420],[540,490],[540,590]],
+    branchStations: ["actor","threatProfile","attackVector","exploitability","methodologies","likelihood","impact","riskScore"]
+  },
+  {
+    phaseNumber: 5,
+    title: "Assess the Risk",
+    desc: "Risk ratings — inherent, residual, and target risk with formal assessment",
+    color: "#6b6b6b",
+    waypoints: [[540,590],[570,640],[700,700],[800,730],[900,750]],
+    branchStations: ["inherentRisk","residualRisk","targetRisk","assessment"]
+  },
+  {
+    phaseNumber: 6,
+    title: "Apply Controls",
+    desc: "Security controls — effectiveness, implementation traceability",
+    color: "#27ae60",
+    waypoints: [[900,750],[950,810],[1050,860],[1150,880],[1260,900]],
+    branchStations: ["effectiveness","appliesTo","implementedBy"]
+  },
+  {
+    phaseNumber: 7,
+    title: "Verify Governance",
+    desc: "Requirements chain — controls satisfy requirements, verified by acceptance criteria",
+    color: "#16a085",
+    waypoints: [[1260,900],[1280,950],[1300,1000],[1320,1050]],
+    branchStations: []
+  }
+];
+
+const routeOverlay = document.getElementById('route-overlay');
+const trainDot = document.getElementById('train-dot');
+const trainGlowRing = document.getElementById('train-glow-ring');
+const routeTrail = document.getElementById('route-trail');
+const phaseBanner = document.getElementById('phase-banner');
+const phaseNumDisplay = document.getElementById('phase-num');
+const phaseTitleDisplay = document.getElementById('phase-title');
+const phaseDescDisplay = document.getElementById('phase-desc');
+const phaseDotsContainer = document.getElementById('phase-dots');
+const phaseNextBtn = document.getElementById('phase-next');
+const routeBtn = document.getElementById('route-btn');
+
+let routeActive = false;
+let currentPhaseIndex = -1;
+let animationFrameId = null;
+let trailPoints = [];
+let waitingForAdvance = false;
+
+function setTrainPosition(positionX, positionY) {
+  trainDot.setAttribute('cx', positionX);
+  trainDot.setAttribute('cy', positionY);
+  trainGlowRing.setAttribute('cx', positionX);
+  trainGlowRing.setAttribute('cy', positionY);
+}
+
+function setTrainColor(lineColor) {
+  trainDot.setAttribute('fill', lineColor);
+  trainGlowRing.setAttribute('stroke', lineColor);
+  routeTrail.setAttribute('stroke', lineColor);
+}
+
+function addTrailPoint(trailX, trailY) {
+  trailPoints.push(`${trailX},${trailY}`);
+  routeTrail.setAttribute('points', trailPoints.join(' '));
+}
+
+function updatePhaseDots(activePhaseIndex) {
+  const phaseDotElements = phaseDotsContainer.querySelectorAll('.phase-dot');
+  phaseDotElements.forEach((dotElement, dotIndex) => {
+    dotElement.className = 'phase-dot';
+    if (dotIndex < activePhaseIndex) dotElement.classList.add('completed');
+    if (dotIndex === activePhaseIndex) dotElement.classList.add('current');
+  });
+}
+
+function pulseStations(stationIdList) {
+  stationIdList.forEach((stationId, stationIndex) => {
+    const stationElement = document.querySelector(`[data-station="${stationId}"]`);
+    if (!stationElement) return;
+    setTimeout(() => {
+      stationElement.classList.add('station-active');
+      stationElement.classList.add('station-visited');
+      setTimeout(() => stationElement.classList.remove('station-active'), 900);
+    }, stationIndex * 120);
+  });
+}
+
+function markMainStationVisited(positionX, positionY) {
+  document.querySelectorAll('.station-dot, .hub-circle').forEach(stationElement => {
+    const circleElement = stationElement.querySelector('circle:not(.hit-area)');
+    if (!circleElement) return;
+    const circleX = parseFloat(circleElement.getAttribute('cx'));
+    const circleY = parseFloat(circleElement.getAttribute('cy'));
+    if (Math.abs(circleX - positionX) < 5 && Math.abs(circleY - positionY) < 5) {
+      stationElement.classList.add('station-visited');
+    }
+  });
+}
+
+function animateAlongWaypoints(waypointList, segmentSpeed, completionCallback) {
+  if (waypointList.length < 2) {
+    if (waypointList.length === 1) {
+      setTrainPosition(waypointList[0][0], waypointList[0][1]);
+      addTrailPoint(waypointList[0][0], waypointList[0][1]);
+      markMainStationVisited(waypointList[0][0], waypointList[0][1]);
+    }
+    completionCallback();
+    return;
+  }
+
+  let currentSegmentIndex = 0;
+  let segmentProgress = 0;
+
+  function moveNextSegment() {
+    if (currentSegmentIndex >= waypointList.length - 1) {
+      completionCallback();
+      return;
+    }
+
+    const startPoint = waypointList[currentSegmentIndex];
+    const endPoint = waypointList[currentSegmentIndex + 1];
+    const segmentDeltaX = endPoint[0] - startPoint[0];
+    const segmentDeltaY = endPoint[1] - startPoint[1];
+    const segmentLength = Math.sqrt(segmentDeltaX * segmentDeltaX + segmentDeltaY * segmentDeltaY);
+    const segmentDurationMs = (segmentLength / segmentSpeed) * 1000;
+    let segmentStartTime = null;
+
+    addTrailPoint(startPoint[0], startPoint[1]);
+    markMainStationVisited(startPoint[0], startPoint[1]);
+
+    function animateFrame(frameTimestamp) {
+      if (!routeActive) return;
+      if (!segmentStartTime) segmentStartTime = frameTimestamp;
+      segmentProgress = Math.min((frameTimestamp - segmentStartTime) / segmentDurationMs, 1);
+
+      const currentX = startPoint[0] + segmentDeltaX * segmentProgress;
+      const currentY = startPoint[1] + segmentDeltaY * segmentProgress;
+      setTrainPosition(currentX, currentY);
+
+      if (segmentProgress < 1) {
+        animationFrameId = requestAnimationFrame(animateFrame);
+      } else {
+        addTrailPoint(endPoint[0], endPoint[1]);
+        markMainStationVisited(endPoint[0], endPoint[1]);
+        currentSegmentIndex++;
+        moveNextSegment();
+      }
+    }
+
+    animationFrameId = requestAnimationFrame(animateFrame);
+  }
+
+  moveNextSegment();
+}
+
+function showPhase(phaseIndex) {
+  const phaseData = routePhases[phaseIndex];
+  currentPhaseIndex = phaseIndex;
+
+  phaseNumDisplay.textContent = phaseData.phaseNumber;
+  phaseNumDisplay.style.color = phaseData.color;
+  phaseTitleDisplay.textContent = phaseData.title;
+  phaseDescDisplay.textContent = phaseData.desc;
+  updatePhaseDots(phaseIndex);
+  setTrainColor(phaseData.color);
+
+  if (phaseIndex === routePhases.length - 1) {
+    phaseNextBtn.textContent = 'Done ✓';
+  } else {
+    phaseNextBtn.textContent = 'Next →';
+  }
+
+  animateAlongWaypoints(phaseData.waypoints, 150, () => {
+    pulseStations(phaseData.branchStations);
+    waitingForAdvance = true;
+  });
+}
+
+function advancePhase() {
+  if (!routeActive || !waitingForAdvance) return;
+  waitingForAdvance = false;
+
+  if (currentPhaseIndex >= routePhases.length - 1) {
+    resetRoute();
+    return;
+  }
+
+  showPhase(currentPhaseIndex + 1);
+}
+
+function startRoute() {
+  if (activeLineFilter) applyLineFilter(activeLineFilter);
+  routeActive = true;
+  trailPoints = [];
+  routeTrail.setAttribute('points', '');
+  routeOverlay.style.display = '';
+  phaseBanner.classList.add('visible');
+  routeBtn.textContent = '■ Stop';
+
+  document.querySelectorAll('.station-dot, .hub-circle').forEach(stationElement => {
+    stationElement.classList.remove('station-active', 'station-visited');
+  });
+
+  showPhase(0);
+}
+
+function resetRoute() {
+  routeActive = false;
+  waitingForAdvance = false;
+  currentPhaseIndex = -1;
+
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
+
+  routeOverlay.style.display = 'none';
+  phaseBanner.classList.remove('visible');
+  routeBtn.textContent = '▶ Route';
+
+  trailPoints = [];
+  routeTrail.setAttribute('points', '');
+
+  document.querySelectorAll('.station-dot, .hub-circle').forEach(stationElement => {
+    stationElement.classList.remove('station-active', 'station-visited');
+  });
+}
+
+routeBtn.addEventListener('click', () => {
+  if (routeActive) {
+    resetRoute();
+  } else {
+    startRoute();
+  }
+});
+
+phaseNextBtn.addEventListener('click', advancePhase);
+
+document.addEventListener('keydown', (keyEvent) => {
+  if (!routeActive) return;
+  if (keyEvent.key === 'ArrowRight' || keyEvent.key === ' ') {
+    keyEvent.preventDefault();
+    advancePhase();
+  }
+  if (keyEvent.key === 'r' || keyEvent.key === 'R' || keyEvent.key === 'Escape') {
+    resetRoute();
+  }
+});
+
+// ─── Draggable Stations (Edit Mode) ──────────────────
+const stationPositions = {};
+const stationLinks = {};
+let editModeActive = false;
+let dragTarget = null;
+let dragStationKey = null;
+let dragStartSvgPoint = null;
+let dragStartStationPos = null;
+
+const editBtn = document.getElementById('edit-btn');
+const resetLayoutBtn = document.getElementById('reset-layout-btn');
+const controlsDiv = document.getElementById('controls');
+
+function clientToSvgPoint(clientX, clientY) {
+  const svgPoint = svgElement.createSVGPoint();
+  svgPoint.x = clientX;
+  svgPoint.y = clientY;
+  return svgPoint.matrixTransform(svgElement.getScreenCTM().inverse());
+}
+
+function buildRegistry() {
+  const allLabels = Array.from(document.querySelectorAll('.station-label'));
+  const allPolylines = Array.from(mapGroup.querySelectorAll('polyline:not(#route-trail)'));
+  const allTerminalRects = Array.from(mapGroup.querySelectorAll('rect'));
+
+  document.querySelectorAll('.station-dot, .hub-circle').forEach(stationElement => {
+    const stationKey = stationElement.dataset.station;
+    const firstCircle = stationElement.querySelector('circle');
+    const stationX = parseFloat(firstCircle.getAttribute('cx'));
+    const stationY = parseFloat(firstCircle.getAttribute('cy'));
+
+    stationPositions[stationKey] = { x: stationX, y: stationY };
+
+    // Find nearest label
+    let nearestLabel = null;
+    let nearestDistance = Infinity;
+    allLabels.forEach(labelElement => {
+      const labelX = parseFloat(labelElement.getAttribute('x'));
+      const labelY = parseFloat(labelElement.getAttribute('y'));
+      const distance = Math.hypot(labelX - stationX, labelY - stationY);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestLabel = labelElement;
+      }
+    });
+
+    let labelOffset = null;
+    if (nearestLabel && nearestDistance < 80) {
+      labelOffset = {
+        dx: parseFloat(nearestLabel.getAttribute('x')) - stationX,
+        dy: parseFloat(nearestLabel.getAttribute('y')) - stationY
+      };
+    } else {
+      nearestLabel = null;
+    }
+
+    // Find matching polyline points
+    const polylineMatches = [];
+    allPolylines.forEach(polyline => {
+      const pointPairs = polyline.getAttribute('points').trim().split(/\s+/);
+      pointPairs.forEach((pair, pointIndex) => {
+        const [pointX, pointY] = pair.split(',').map(Number);
+        if (Math.abs(pointX - stationX) <= 3 && Math.abs(pointY - stationY) <= 3) {
+          polylineMatches.push({ polyline, pointIndex });
+        }
+      });
+    });
+
+    // Find matching terminal caps
+    const terminalCapMatches = [];
+    allTerminalRects.forEach(rect => {
+      const rectX = parseFloat(rect.getAttribute('x'));
+      const rectY = parseFloat(rect.getAttribute('y'));
+      const rectWidth = parseFloat(rect.getAttribute('width'));
+      const rectHeight = parseFloat(rect.getAttribute('height'));
+      const centerX = rectX + rectWidth / 2;
+      const centerY = rectY + rectHeight / 2;
+      if (Math.abs(centerX - stationX) <= 15 && Math.abs(centerY - stationY) <= 15) {
+        terminalCapMatches.push(rect);
+      }
+    });
+
+    stationLinks[stationKey] = {
+      element: stationElement,
+      label: nearestLabel,
+      labelOffset,
+      polylinePoints: polylineMatches,
+      terminalCaps: terminalCapMatches
+    };
+  });
+}
+
+function moveStation(stationKey, newX, newY) {
+  const oldPosition = stationPositions[stationKey];
+  const deltaX = newX - oldPosition.x;
+  const deltaY = newY - oldPosition.y;
+
+  stationPositions[stationKey] = { x: newX, y: newY };
+
+  // Update all circles in the station group
+  const stationElement = stationLinks[stationKey].element;
+  stationElement.querySelectorAll('circle').forEach(circle => {
+    circle.setAttribute('cx', parseFloat(circle.getAttribute('cx')) + deltaX);
+    circle.setAttribute('cy', parseFloat(circle.getAttribute('cy')) + deltaY);
+  });
+
+  // Update linked label (preserve offset)
+  const { label, labelOffset } = stationLinks[stationKey];
+  if (label && labelOffset) {
+    label.setAttribute('x', newX + labelOffset.dx);
+    label.setAttribute('y', newY + labelOffset.dy);
+    label.querySelectorAll('tspan').forEach(tspan => {
+      if (tspan.hasAttribute('x')) {
+        tspan.setAttribute('x', parseFloat(tspan.getAttribute('x')) + deltaX);
+      }
+    });
+  }
+
+  // Update polyline points at matching indices
+  stationLinks[stationKey].polylinePoints.forEach(({ polyline, pointIndex }) => {
+    const pointPairs = polyline.getAttribute('points').trim().split(/\s+/);
+    pointPairs[pointIndex] = `${newX},${newY}`;
+    polyline.setAttribute('points', pointPairs.join(' '));
+  });
+
+  // Update terminal cap positions
+  stationLinks[stationKey].terminalCaps.forEach(rect => {
+    rect.setAttribute('x', parseFloat(rect.getAttribute('x')) + deltaX);
+    rect.setAttribute('y', parseFloat(rect.getAttribute('y')) + deltaY);
+  });
+
+  // Update route animation waypoints
+  routePhases.forEach(phase => {
+    phase.waypoints.forEach(waypoint => {
+      if (Math.abs(waypoint[0] - oldPosition.x) <= 3 && Math.abs(waypoint[1] - oldPosition.y) <= 3) {
+        waypoint[0] = newX;
+        waypoint[1] = newY;
+      }
+    });
+  });
+}
+
+function saveLayout() {
+  localStorage.setItem('tm-bom-layout', JSON.stringify(stationPositions));
+}
+
+function resetLayout() {
+  localStorage.removeItem('tm-bom-layout');
+  location.reload();
+}
+
+// Build registry from original DOM, then apply any saved layout
+buildRegistry();
+
+(function applySavedLayout() {
+  const savedLayoutData = localStorage.getItem('tm-bom-layout');
+  if (!savedLayoutData) return;
+  const savedPositions = JSON.parse(savedLayoutData);
+  Object.keys(savedPositions).forEach(stationKey => {
+    if (stationPositions[stationKey]) {
+      moveStation(stationKey, savedPositions[stationKey].x, savedPositions[stationKey].y);
+    }
+  });
+})();
+
+// ─── Line Filter (click legend to isolate a line) ────
+const lineFilterMap = {
+  purple: {
+    stations: ['threatModel', 'weakness', 'vulnerabilities', 'capec', 'killChain', 'indicators'],
+    hubs: ['blueprint', 'threat']
+  },
+  cyan: {
+    stations: ['assumptions', 'assets', 'dataStores', 'dataSets', 'relationships', 'zones', 'boundaries', 'flows', 'useCases', 'behaviors', 'blueprintActors'],
+    hubs: ['blueprint']
+  },
+  orange: {
+    stations: ['methodologies', 'actor', 'threatProfile', 'attackVector', 'exploitability', 'likelihood', 'impact', 'riskScore', 'attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries'],
+    hubs: ['threat', 'threatScenario', 'affectedAssets']
+  },
+  gray: {
+    stations: ['inherentRisk', 'residualRisk', 'targetRisk', 'riskResponse', 'assessment'],
+    hubs: ['affectedAssets', 'threatScenario', 'risk']
+  },
+  green: {
+    stations: ['effectiveness', 'appliesTo', 'implementedBy'],
+    hubs: ['risk', 'control']
+  },
+  teal: {
+    stations: ['satisfies', 'requirements', 'acceptanceCriteria'],
+    hubs: ['control']
+  }
+};
+
+const lineColorHexMap = {
+  purple: '#3b2d8e', cyan: '#2980b9',
+  orange: '#d4721a', gray: '#6b6b6b', green: '#27ae60', teal: '#16a085'
+};
+
+let activeLineFilter = null;
+
+function applyLineFilter(lineKey) {
+  activeLineFilter = (activeLineFilter === lineKey) ? null : lineKey;
+
+  document.querySelectorAll('.legend-item[data-line]').forEach(legendItem => {
+    if (legendItem.dataset.line === 'all') {
+      legendItem.classList.toggle('active', !activeLineFilter);
+    } else {
+      legendItem.classList.toggle('active', legendItem.dataset.line === activeLineFilter);
+    }
+  });
+
+  const dimOpacity = '0.06';
+
+  if (!activeLineFilter) {
+    mapGroup.querySelectorAll('polyline:not(#route-trail)').forEach(el => { el.style.opacity = ''; });
+    mapGroup.querySelectorAll('rect').forEach(el => { el.style.opacity = ''; });
+    document.querySelectorAll('.station-dot, .hub-circle').forEach(el => {
+      el.style.opacity = '';
+      el.style.pointerEvents = '';
+    });
+    document.querySelectorAll('.station-label').forEach(el => { el.style.opacity = ''; });
+    return;
+  }
+
+  const filterDefinition = lineFilterMap[activeLineFilter];
+  const visibleStationKeys = new Set([...filterDefinition.stations, ...filterDefinition.hubs]);
+  const activeCssClass = 'line-' + activeLineFilter;
+  const activeHexColor = lineColorHexMap[activeLineFilter];
+
+  mapGroup.querySelectorAll('polyline:not(#route-trail)').forEach(el => {
+    el.style.opacity = el.classList.contains(activeCssClass) ? '' : dimOpacity;
+  });
+
+  mapGroup.querySelectorAll('rect').forEach(el => {
+    el.style.opacity = el.getAttribute('fill') === activeHexColor ? '' : dimOpacity;
+  });
+
+  document.querySelectorAll('.station-dot, .hub-circle').forEach(el => {
+    const isVisible = visibleStationKeys.has(el.dataset.station);
+    el.style.opacity = isVisible ? '' : dimOpacity;
+    el.style.pointerEvents = isVisible ? '' : 'none';
+  });
+
+  const visibleLabelElements = new Set();
+  visibleStationKeys.forEach(stationKey => {
+    if (stationLinks[stationKey] && stationLinks[stationKey].label) {
+      visibleLabelElements.add(stationLinks[stationKey].label);
+    }
+  });
+  document.querySelectorAll('.station-label').forEach(el => {
+    el.style.opacity = visibleLabelElements.has(el) ? '' : dimOpacity;
+  });
+}
+
+document.querySelectorAll('.legend-item[data-line]').forEach(legendItem => {
+  legendItem.addEventListener('click', () => {
+    if (routeActive) return;
+    if (legendItem.dataset.line === 'all') {
+      if (activeLineFilter) applyLineFilter(activeLineFilter);
+    } else {
+      applyLineFilter(legendItem.dataset.line);
+    }
+  });
+});
+
+// Edit mode toggle
+editBtn.addEventListener('click', () => {
+  editModeActive = !editModeActive;
+  if (editModeActive) {
+    editBtn.textContent = '✎ Done';
+    editBtn.classList.add('active');
+    controlsDiv.classList.add('edit-mode-controls');
+    mapGroup.classList.add('edit-mode');
+    if (routeActive) resetRoute();
+    if (activeLineFilter) applyLineFilter(activeLineFilter);
+    routeBtn.disabled = true;
+    routeBtn.style.opacity = '0.4';
+  } else {
+    editBtn.textContent = '✎ Edit';
+    editBtn.classList.remove('active');
+    controlsDiv.classList.remove('edit-mode-controls');
+    mapGroup.classList.remove('edit-mode');
+    routeBtn.disabled = false;
+    routeBtn.style.opacity = '';
+  }
+});
+
+// Drag handlers
+mapGroup.addEventListener('mousedown', (e) => {
+  if (!editModeActive) return;
+  const stationElement = e.target.closest('.station-dot, .hub-circle');
+  if (!stationElement) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  dragStationKey = stationElement.dataset.station;
+  dragTarget = stationElement;
+  dragTarget.classList.add('dragging');
+  dragStartSvgPoint = clientToSvgPoint(e.clientX, e.clientY);
+  dragStartStationPos = { ...stationPositions[dragStationKey] };
+  container.classList.add('grabbing');
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!dragTarget) return;
+  const currentSvgPoint = clientToSvgPoint(e.clientX, e.clientY);
+  const newX = dragStartStationPos.x + (currentSvgPoint.x - dragStartSvgPoint.x);
+  const newY = dragStartStationPos.y + (currentSvgPoint.y - dragStartSvgPoint.y);
+  moveStation(dragStationKey, newX, newY);
+});
+
+window.addEventListener('mouseup', () => {
+  if (!dragTarget) return;
+  dragTarget.classList.remove('dragging');
+  container.classList.remove('grabbing');
+  saveLayout();
+  dragTarget = null;
+  dragStationKey = null;
+  dragStartSvgPoint = null;
+  dragStartStationPos = null;
+});
+
+resetLayoutBtn.addEventListener('click', resetLayout);
+</script>
+</body>
+</html>
