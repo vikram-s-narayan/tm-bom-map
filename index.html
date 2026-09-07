@@ -509,13 +509,15 @@
       <!-- GRAY LINES — Risk Management                 -->
       <!-- ============================================ -->
 
-      <!-- Threat Scenario → Affected Assets (orange side of hub) -->
+      <!-- Threat Scenario → Affected Assets (orange branch — schema: threatScenario.affectedAssets) -->
       <polyline points="540,590 570,640 700,700"
                 class="line-orange" stroke-width="7"/>
 
-      <!-- Affected Assets → Risk hub -->
-      <polyline points="700,700 800,730 900,750"
-                class="line-gray" stroke-width="7"/>
+      <!-- Threat Scenario → Risk hub (gray dashed — bom-ref cross-reference via threatScenario.relatedRisks / risk.relatedThreats) -->
+      <polyline points="540,590 640,660 780,720 900,750"
+                stroke="#6b6b6b" stroke-width="5" fill="none"
+                stroke-dasharray="16,8" opacity="0.6"
+                stroke-linecap="round" stroke-linejoin="round"/>
 
       <!-- Threat Scenario → Risk Score (orange — schema: threatScenario.riskScore) -->
       <polyline points="540,590 640,640 1010,720"
@@ -537,8 +539,14 @@
       <polyline points="900,750 950,810 1050,860"
                 class="line-gray" stroke-width="7"/>
 
-      <!-- Risk hub → Assessment -->
+      <!-- Assessment ↔ Risk hub (dashed — assessment is a peer in the 'risks' container, not a child of risk; references risks via bom-ref) -->
       <polyline points="900,750 830,810 780,870"
+                stroke="#6b6b6b" stroke-width="5" fill="none"
+                stroke-dasharray="16,8" opacity="0.6"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- Assessment → Risk Appetite -->
+      <polyline points="780,870 740,900 700,920"
                 class="line-gray" stroke-width="7"/>
 
       <!-- ============================================ -->
@@ -611,14 +619,17 @@
       <rect x="1212" y="532" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Likelihood -->
       <rect x="1262" y="602" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Impact -->
 
+      <!-- Orange terminal for Affected Assets -->
+      <rect x="692" y="692" width="10" height="16" rx="2" fill="#d4721a"/> <!-- Affected Assets -->
+
       <!-- Gray terminals -->
-      <!-- Affected Assets is now a hub — no terminal cap -->
       <rect x="1002" y="712" width="10" height="16" rx="2" fill="#d4721a"/> <!-- Risk Score -->
       <rect x="1002" y="752" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Inherent Risk -->
       <rect x="1002" y="792" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Residual Risk -->
       <rect x="1002" y="832" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Target Risk -->
       <rect x="1042" y="852" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Risk Response -->
       <rect x="770" y="862" width="10" height="16" rx="2" fill="#6b6b6b"/>  <!-- Assessment -->
+      <rect x="692" y="912" width="10" height="16" rx="2" fill="#6b6b6b"/>  <!-- Risk Appetite -->
 
       <!-- Green terminals -->
       <rect x="1362" y="862" width="10" height="16" rx="2" fill="#27ae60"/> <!-- Effectiveness -->
@@ -757,11 +768,10 @@
       </g>
 
       <!-- Gray stations (Risk Management) -->
-      <!-- Affected Assets Hub (Scenario → Risk) -->
-      <g class="hub-circle" data-station="affectedAssets">
-        <circle class="hit-area" cx="700" cy="700" r="24"/>
-        <circle cx="700" cy="700" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
-        <circle cx="700" cy="700" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
+      <!-- Affected Assets (orange station — property of threatScenario) -->
+      <g class="station-dot" data-station="affectedAssets">
+        <circle class="hit-area" cx="700" cy="700" r="20"/>
+        <circle cx="700" cy="700" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="riskScore">
         <circle class="hit-area" cx="1010" cy="720" r="20"/>
@@ -786,6 +796,10 @@
       <g class="station-dot" data-station="assessment">
         <circle class="hit-area" cx="780" cy="870" r="20"/>
         <circle cx="780" cy="870" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="riskAppetite">
+        <circle class="hit-area" cx="700" cy="920" r="20"/>
+        <circle cx="700" cy="920" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
       </g>
 
       <!-- Green stations (Controls & Mitigation) -->
@@ -872,8 +886,8 @@
 
       <!-- Purple labels -->
       <text x="350" y="390" text-anchor="middle" class="station-label label-purple">
-        <tspan x="350" dy="0">Threat</tspan>
-        <tspan x="350" dy="15">Model</tspan>
+        <tspan x="350" dy="0">Threats</tspan>
+        <tspan x="350" dy="15">Container</tspan>
       </text>
       <text x="520" y="125" text-anchor="middle" class="station-label label-purple">
         <tspan x="520" dy="0">Weakness</tspan>
@@ -940,7 +954,7 @@
       <text x="1285" y="608" text-anchor="start" class="station-label label-orange">Impact</text>
 
       <!-- Gray labels (Risk Management) -->
-      <text x="680" y="685" text-anchor="middle" class="station-label" style="font-size:14px; fill:#222;" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
+      <text x="680" y="685" text-anchor="middle" class="station-label label-orange" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
         <tspan x="680" dy="0">Affected</tspan>
         <tspan x="680" dy="14">Assets</tspan>
       </text>
@@ -965,6 +979,10 @@
         <tspan x="1065" dy="14">Response</tspan>
       </text>
       <text x="780" y="895" text-anchor="middle" class="station-label label-gray">Assessment</text>
+      <text x="685" y="918" text-anchor="end" class="station-label label-gray">
+        <tspan x="685" dy="0">Risk</tspan>
+        <tspan x="685" dy="14">Appetite</tspan>
+      </text>
 
       <!-- Green labels (Controls) -->
       <text x="1385" y="865" text-anchor="start" class="station-label label-green">Effectiveness</text>
@@ -1002,6 +1020,42 @@
       <!-- threat.behaviors — purple dashed to cyan Behaviors -->
       <polyline points="620,360 380,540 140,710"
                 stroke="#3b2d8e" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- risk.affects — refs from risk back to components/services/datasets (Fix #3) -->
+      <polyline points="900,750 600,620 300,500 100,460"
+                stroke="#6b6b6b" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- risk.relatedVulnerabilities — refs from risk to vulnerabilities (Fix #4) -->
+      <polyline points="900,750 920,550 830,380 690,200"
+                stroke="#6b6b6b" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- risk.relatedWeaknesses — refs from risk to weaknesses (Fix #4) -->
+      <polyline points="900,750 780,520 630,300 520,140"
+                stroke="#6b6b6b" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- risk.relatedRequirements — refs from risk to requirements (Fix #4) -->
+      <polyline points="900,750 1050,850 1200,950 1300,1000"
+                stroke="#6b6b6b" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- control.appliesTo — refs back to blueprint assets/zones/boundaries (Fix #7) -->
+      <polyline points="1160,940 900,920 500,750 200,500 100,460"
+                stroke="#27ae60" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- control.implementedBy — refs back to blueprint components/services (Fix #7) -->
+      <polyline points="1150,990 800,980 400,820 150,650 200,360"
+                stroke="#27ae60" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
                 stroke-linecap="round" stroke-linejoin="round"/>
 
@@ -1063,11 +1117,11 @@ const stationData = {
     example: "E-commerce platform with payment gateway, user database, CDN, and third-party shipping API"
   },
   threatModel: {
-    title: "Threat Model",
+    title: "Threats Container",
     line: "Threat Intelligence",
     color: "#3b2d8e",
-    desc: "The overarching threat model referencing the blueprint scope and enumerating identified threats.",
-    props: ["name", "description", "scope", "methodology"],
+    desc: "The top-level 'threats' container in the BOM — holds threats, scenarios, attack patterns, attack trees, abuse cases, trust boundaries, and methodologies. Not a standalone schema object; this IS the threat model.",
+    props: ["threats", "scenarios", "attackPatterns", "attackTrees", "attackPaths", "abuseCases", "trustBoundaries", "methodologies"],
     example: "STRIDE analysis of the checkout flow covering payment, authentication, and order services"
   },
   threat: {
@@ -1312,25 +1366,25 @@ const stationData = {
   // ── Gray — Risk Management ────────────────────────
   affectedAssets: {
     title: "Affected Assets",
-    line: "Hub — Scenario / Risk",
-    color: "#222",
-    desc: "Components, services, or data stores impacted by this threat scenario.",
-    props: ["component refs", "service refs", "data refs"],
+    line: "Threat Scenario",
+    color: "#d4721a",
+    desc: "References to the assets affected in this threat scenario. A property of threat and threatScenario — not a risk property.",
+    props: ["bom-ref links to components", "bom-ref links to services", "bom-ref links to data stores"],
     example: "User database (PostgreSQL), Search Service API, Customer PII dataset"
   },
   risk: {
     title: "Risk",
     line: "Hub — Risk / Controls",
     color: "#222",
-    desc: "The formal risk object connecting risk ratings to responses and controls. Hub linking risk management (gray) to controls & mitigation (green).",
-    props: ["name", "statement", "riskScore", "inherentRisk", "residualRisk", "targetRisk", "responses", "status"],
+    desc: "The formal risk object connecting risk ratings to responses and controls. Has bom-ref cross-references back to threats (relatedThreats), vulnerabilities (relatedVulnerabilities), weaknesses (relatedWeaknesses), requirements (relatedRequirements), and affected subjects (affects).",
+    props: ["name", "statement", "affects", "relatedThreats", "relatedVulnerabilities", "relatedWeaknesses", "relatedRequirements", "inherentRisk", "residualRisk", "targetRisk", "responses", "status", "owner"],
     example: "RISK-007: Customer data breach via SQL injection — Inherent: Critical, Residual: Medium, Target: Low"
   },
   riskScore: {
     title: "Risk Score",
     line: "Threat Scenario",
     color: "#d4721a",
-    desc: "Quantified risk rating using a chosen methodology — combines likelihood and impact into a single assessment.",
+    desc: "Quantified risk rating on the threat scenario using a chosen methodology. A property of threatScenario only — the risk object uses separate inherentRisk/residualRisk/targetRisk rating objects instead.",
     props: ["level (info → critical)", "score", "vector", "methodology (DREAD, FAIR, OWASP, etc.)"],
     example: "OWASP Risk Rating: Critical (Likelihood: High x Impact: Critical = 9.2/10)"
   },
@@ -1338,8 +1392,8 @@ const stationData = {
     title: "Inherent Risk",
     line: "Risk Management",
     color: "#6b6b6b",
-    desc: "Pre-control risk rating — the risk level before any mitigating controls are applied.",
-    props: ["level", "score", "vector", "methodology", "justification"],
+    desc: "Pre-control risk rating — the risk level before any mitigating controls are applied. Uses the 'rating' object type (likelihood, impact, factors), distinct from threatScenario.riskScore.",
+    props: ["likelihood", "impact", "score", "level", "vector", "methodology", "justification"],
     example: "Critical (9.2) — before parameterized queries, WAF, or input validation are deployed"
   },
   residualRisk: {
@@ -1370,9 +1424,18 @@ const stationData = {
     title: "Assessment",
     line: "Risk Management",
     color: "#6b6b6b",
-    desc: "Formal risk assessment with defined scope, cadence, methodology, and recommendations.",
-    props: ["name", "scope", "methodology", "cadence", "findings", "recommendations"],
+    desc: "Point-in-time risk assessment event. A peer of risks inside the top-level 'risks' container — not a property of individual risk objects. References risks via bom-ref and computes an overallRisk score.",
+    props: ["name", "type", "cadence", "scope", "status", "assessors", "risks (refs)", "overallRisk", "riskAppetites", "recommendations"],
     example: "Q3 2026 Application Security Review — scope: all public-facing APIs; finding: 3 SQLi vectors in search service"
+  },
+
+  riskAppetite: {
+    title: "Risk Appetite",
+    line: "Risk Management",
+    color: "#6b6b6b",
+    desc: "The acceptable level of risk an organization is willing to bear. Defined in the top-level 'risks' container and within individual assessments.",
+    props: ["name", "description", "level", "domain", "owner", "conditions"],
+    example: "Data breach risk appetite: Low — zero tolerance for customer PII exposure; Availability risk: Medium — up to 4h downtime acceptable"
   },
 
   // ── Green — Controls & Mitigation ─────────────────
@@ -1396,16 +1459,16 @@ const stationData = {
     title: "Applies To",
     line: "Controls & Mitigation",
     color: "#27ae60",
-    desc: "Links a control back to the blueprint assets, zones, or boundaries it protects — where the control is enforced.",
-    props: ["control", "assetRefs", "zoneRefs", "boundaryRefs", "scope"],
+    desc: "Bom-ref links from a control back to the blueprint elements it protects — components, services, zones, or boundaries. Closes the loop from controls back to the system model.",
+    props: ["bom-ref links to components", "bom-ref links to services", "bom-ref links to zones", "bom-ref links to boundaries"],
     example: "CTL-019 applies to all API endpoints in Payment Service and Search Service that query PostgreSQL — scope: production + staging"
   },
   implementedBy: {
     title: "Implemented By",
     line: "Controls & Mitigation",
     color: "#27ae60",
-    desc: "The components or services that implement a control — the concrete technical realization of a security measure.",
-    props: ["control", "componentRefs", "serviceRefs", "configuration", "version"],
+    desc: "Bom-ref links to the components, services, or formulation workflows that implement this control. Closes the loop from controls back to the system model.",
+    props: ["bom-ref links to components", "bom-ref links to services", "bom-ref links to formulation workflows", "bom-ref links to parties"],
     example: "CTL-019 implemented by ORM layer (Prisma v5.2) enforcing parameterized queries; AWS WAF rule set v3.2 blocking SQLi patterns"
   },
 
@@ -1422,8 +1485,8 @@ const stationData = {
     title: "Requirements",
     line: "Requirements & Governance",
     color: "#16a085",
-    desc: "Security and functional requirements that controls must satisfy — referenced by risk, control, blueprint, and use cases.",
-    props: ["name", "type (security/functional/compliance)", "priority", "source", "satisfiedBy"],
+    desc: "Formal requirement objects from cyclonedx-requirement-2.0 — security, functional, and compliance requirements with acceptance criteria, dependencies, and risk links. Distinct from blueprint.requirements, which references these objects via bom-ref.",
+    props: ["name", "type (security/functional/compliance)", "priority", "status", "acceptanceCriteria", "dependencies", "risk", "stakeholders"],
     example: "REQ-SEC-04: All database queries must use parameterized statements — Priority: Critical, Source: OWASP ASVS 5.3.4, Status: Approved"
   },
   acceptanceCriteria: {
@@ -1620,7 +1683,7 @@ const routePhases = [
     title: "Assess the Risk",
     desc: "Risk ratings — inherent, residual, and target risk with formal assessment",
     color: "#6b6b6b",
-    waypoints: [[540,590],[570,640],[700,700],[800,730],[900,750]],
+    waypoints: [[540,590],[640,660],[780,720],[900,750]],
     branchStations: ["inherentRisk","residualRisk","targetRisk","assessment"]
   },
   {
@@ -2036,12 +2099,12 @@ const lineFilterMap = {
     hubs: ['blueprint']
   },
   orange: {
-    stations: ['methodologies', 'actor', 'threatProfile', 'attackVector', 'exploitability', 'likelihood', 'impact', 'riskScore', 'attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries'],
-    hubs: ['threat', 'threatScenario', 'affectedAssets']
+    stations: ['methodologies', 'actor', 'threatProfile', 'attackVector', 'exploitability', 'likelihood', 'impact', 'riskScore', 'attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries', 'affectedAssets'],
+    hubs: ['threat', 'threatScenario']
   },
   gray: {
-    stations: ['inherentRisk', 'residualRisk', 'targetRisk', 'riskResponse', 'assessment'],
-    hubs: ['affectedAssets', 'threatScenario', 'risk']
+    stations: ['inherentRisk', 'residualRisk', 'targetRisk', 'riskResponse', 'assessment', 'riskAppetite'],
+    hubs: ['threatScenario', 'risk']
   },
   green: {
     stations: ['effectiveness', 'appliesTo', 'implementedBy'],
