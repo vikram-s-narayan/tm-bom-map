@@ -103,10 +103,13 @@
   /* Metro line styles */
   .line-purple { stroke: #3b2d8e; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .line-orange { stroke: #d4721a; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .line-red    { stroke: #b7472a; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .line-gray   { stroke: #6b6b6b; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .line-green  { stroke: #27ae60; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .line-teal   { stroke: #16a085; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .line-cyan   { stroke: #2980b9; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .line-sienna { stroke: #A0522D; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .line-gold   { stroke: #9B7B2C; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
   /* Station styles */
   .station-dot {
@@ -128,10 +131,13 @@
 
   .label-purple { fill: #3b2d8e; }
   .label-orange { fill: #d4721a; }
+  .label-red    { fill: #b7472a; }
   .label-gray   { fill: #555; }
   .label-green  { fill: #27ae60; }
   .label-teal   { fill: #16a085; }
   .label-cyan   { fill: #2980b9; }
+  .label-sienna { fill: #A0522D; }
+  .label-gold  { fill: #9B7B2C; }
 
   .hub-circle {
     cursor: pointer;
@@ -314,8 +320,12 @@
   <h1>Threat Modeling BOM — Metro Map</h1>
   <div class="legend">
     <div class="legend-item active" data-line="all">
-      <div class="legend-swatch" style="background:linear-gradient(90deg,#3b2d8e,#d4721a,#6b6b6b,#27ae60,#16a085,#2980b9);"></div>
+      <div class="legend-swatch" style="background:linear-gradient(90deg,#9B7B2C,#3b2d8e,#A0522D,#d4721a,#b7472a,#6b6b6b,#27ae60,#16a085,#2980b9);"></div>
       All
+    </div>
+    <div class="legend-item" data-line="gold">
+      <div class="legend-swatch" style="background:#9B7B2C;"></div>
+      Business Objectives
     </div>
     <div class="legend-item" data-line="purple">
       <div class="legend-swatch" style="background:#3b2d8e;"></div>
@@ -323,7 +333,11 @@
     </div>
     <div class="legend-item" data-line="orange">
       <div class="legend-swatch" style="background:#d4721a;"></div>
-      Threat Scenario
+      Attack Modeling
+    </div>
+    <div class="legend-item" data-line="red">
+      <div class="legend-swatch" style="background:#b7472a;"></div>
+      Scenario Assessment
     </div>
     <div class="legend-item" data-line="gray">
       <div class="legend-swatch" style="background:#6b6b6b;"></div>
@@ -336,6 +350,10 @@
     <div class="legend-item" data-line="teal">
       <div class="legend-swatch" style="background:#16a085;"></div>
       Requirements
+    </div>
+    <div class="legend-item" data-line="sienna">
+      <div class="legend-swatch" style="background:#A0522D;"></div>
+      Threat Origin
     </div>
     <div class="legend-item" data-line="cyan">
       <div class="legend-swatch" style="background:#2980b9;"></div>
@@ -408,6 +426,34 @@
       <!-- Kill Chain → Indicators -->
       <polyline points="760,320 860,290 960,270"
                 class="line-purple" stroke-width="8"/>
+
+      <!-- ============================================ -->
+      <!-- SIENNA LINES — Threat Origin                 -->
+      <!-- ============================================ -->
+
+      <!-- Threat → Origin branch (up-left, between CWE and Assumptions) -->
+      <polyline points="620,360 560,300 420,240"
+                class="line-sienna" stroke-width="8"/>
+      <!-- Origin → Adversarial -->
+      <polyline points="420,240 350,200"
+                class="line-sienna" stroke-width="8"/>
+      <!-- Origin → Accidental -->
+      <polyline points="420,240 370,140"
+                class="line-sienna" stroke-width="8"/>
+      <!-- Origin → Structural -->
+      <polyline points="420,240 290,180"
+                class="line-sienna" stroke-width="8"/>
+      <!-- Origin → Environmental -->
+      <polyline points="420,240 260,240"
+                class="line-sienna" stroke-width="8"/>
+
+      <!-- ============================================ -->
+      <!-- GOLD LINE — Business Objectives              -->
+      <!-- ============================================ -->
+
+      <!-- Business Objectives terminus spur -->
+      <polyline points="80,120 80,160"
+                class="line-gold" stroke-width="7"/>
 
       <!-- ============================================ -->
       <!-- CYAN LINES — System Model / Use Cases        -->
@@ -489,29 +535,29 @@
       <polyline points="620,360 680,410 920,480 1330,490"
                 class="line-orange" stroke-width="7"/>
 
-      <!-- Fan lines converging to Threat Scenario hub -->
+      <!-- Threat → Threat Scenario (transition to scenario assessment line) -->
       <polyline points="620,360 580,420 540,490 540,590"
-                class="line-orange" stroke-width="7"/>
+                class="line-red" stroke-width="7"/>
 
       <!-- Threat Scenario → Methodologies (branch left-up) -->
       <polyline points="540,590 480,570 430,550"
-                class="line-orange" stroke-width="7"/>
+                class="line-red" stroke-width="7"/>
 
       <!-- Threat Scenario → Likelihood -->
       <polyline points="540,590 640,590 1220,540"
-                class="line-orange" stroke-width="7"/>
+                class="line-red" stroke-width="7"/>
 
       <!-- Threat Scenario → Impact -->
       <polyline points="540,590 640,610 1270,610"
-                class="line-orange" stroke-width="7"/>
+                class="line-red" stroke-width="7"/>
 
       <!-- ============================================ -->
       <!-- GRAY LINES — Risk Management                 -->
       <!-- ============================================ -->
 
-      <!-- Threat Scenario → Affected Assets (orange branch — schema: threatScenario.affectedAssets) -->
+      <!-- Threat Scenario → Affected Assets (schema: threatScenario.affectedAssets) -->
       <polyline points="540,590 570,640 700,700"
-                class="line-orange" stroke-width="7"/>
+                class="line-red" stroke-width="7"/>
 
       <!-- Threat Scenario → Risk hub (gray dashed — bom-ref cross-reference via threatScenario.relatedRisks / risk.relatedThreats) -->
       <polyline points="540,590 640,660 780,720 900,750"
@@ -519,9 +565,9 @@
                 stroke-dasharray="16,8" opacity="0.6"
                 stroke-linecap="round" stroke-linejoin="round"/>
 
-      <!-- Threat Scenario → Risk Score (orange — schema: threatScenario.riskScore) -->
+      <!-- Threat Scenario → Risk Score (schema: threatScenario.riskScore) -->
       <polyline points="540,590 640,640 1010,720"
-                class="line-orange" stroke-width="7"/>
+                class="line-red" stroke-width="7"/>
 
       <!-- Risk hub → Inherent Risk -->
       <polyline points="900,750 1010,760"
@@ -597,6 +643,9 @@
       <rect x="753" y="312" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Kill Chain -->
       <rect x="952" y="262" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Indicators -->
 
+      <!-- Gold terminal -->
+      <rect x="75" y="112" width="10" height="16" rx="2" fill="#9B7B2C"/>   <!-- Business Objectives -->
+
       <!-- Cyan terminals -->
       <rect x="112" y="282" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Assumptions -->
       <rect x="-8" y="482" width="10" height="16" rx="2" fill="#2980b9"/>    <!-- Data Stores -->
@@ -610,20 +659,19 @@
       <rect x="812" y="432" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Paths -->
       <rect x="912" y="462" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Trust Boundaries -->
 
-      <!-- Orange terminals -->
-      <rect x="422" y="542" width="10" height="16" rx="2" fill="#d4721a"/>   <!-- Methodologies -->
+      <!-- Orange terminals (Attack Modeling — fan from Threat hub) -->
       <rect x="1122" y="262" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- ThreatProfile 1 -->
-      <!-- ThreatProfile 2 removed (duplicate) -->
       <rect x="1212" y="422" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Vector -->
       <rect x="1322" y="482" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Exploitability -->
-      <rect x="1212" y="532" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Likelihood -->
-      <rect x="1262" y="602" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Impact -->
 
-      <!-- Orange terminal for Affected Assets -->
-      <rect x="692" y="692" width="10" height="16" rx="2" fill="#d4721a"/> <!-- Affected Assets -->
+      <!-- Red terminals (Scenario Assessment — fan from Threat Scenario hub) -->
+      <rect x="422" y="542" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Methodologies -->
+      <rect x="1212" y="532" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Likelihood -->
+      <rect x="1262" y="602" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Impact -->
+      <rect x="692" y="692" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Affected Assets -->
+      <rect x="1002" y="712" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Risk Score -->
 
       <!-- Gray terminals -->
-      <rect x="1002" y="712" width="10" height="16" rx="2" fill="#d4721a"/> <!-- Risk Score -->
       <rect x="1002" y="752" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Inherent Risk -->
       <rect x="1002" y="792" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Residual Risk -->
       <rect x="1002" y="832" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Target Risk -->
@@ -670,6 +718,32 @@
       <g class="station-dot" data-station="indicators">
         <circle class="hit-area" cx="960" cy="270" r="20"/>
         <circle cx="960" cy="270" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="threatOrigin">
+        <circle class="hit-area" cx="420" cy="240" r="20"/>
+        <circle cx="420" cy="240" r="6" fill="#fff" stroke="#A0522D" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="originAdversarial">
+        <circle class="hit-area" cx="350" cy="200" r="20"/>
+        <circle cx="350" cy="200" r="6" fill="#fff" stroke="#A0522D" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="originAccidental">
+        <circle class="hit-area" cx="370" cy="140" r="20"/>
+        <circle cx="370" cy="140" r="6" fill="#fff" stroke="#A0522D" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="originStructural">
+        <circle class="hit-area" cx="290" cy="180" r="20"/>
+        <circle cx="290" cy="180" r="6" fill="#fff" stroke="#A0522D" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="originEnvironmental">
+        <circle class="hit-area" cx="260" cy="240" r="20"/>
+        <circle cx="260" cy="240" r="6" fill="#fff" stroke="#A0522D" stroke-width="3" pointer-events="none"/>
+      </g>
+
+      <!-- Gold station (Business Objectives) -->
+      <g class="station-dot" data-station="businessObjectives">
+        <circle class="hit-area" cx="80" cy="160" r="20"/>
+        <circle cx="80" cy="160" r="6" fill="#fff" stroke="#9B7B2C" stroke-width="3" pointer-events="none"/>
       </g>
 
       <!-- Cyan stations (System Model) -->
@@ -739,7 +813,7 @@
       <!-- Orange stations -->
       <g class="station-dot" data-station="methodologies">
         <circle class="hit-area" cx="430" cy="550" r="20"/>
-        <circle cx="430" cy="550" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="430" cy="550" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="actor">
         <circle class="hit-area" cx="1010" cy="240" r="20"/>
@@ -760,22 +834,21 @@
       </g>
       <g class="station-dot" data-station="likelihood">
         <circle class="hit-area" cx="1220" cy="540" r="20"/>
-        <circle cx="1220" cy="540" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="1220" cy="540" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="impact">
         <circle class="hit-area" cx="1270" cy="610" r="20"/>
-        <circle cx="1270" cy="610" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="1270" cy="610" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
 
-      <!-- Gray stations (Risk Management) -->
-      <!-- Affected Assets (orange station — property of threatScenario) -->
+      <!-- Scenario Assessment stations -->
       <g class="station-dot" data-station="affectedAssets">
         <circle class="hit-area" cx="700" cy="700" r="20"/>
-        <circle cx="700" cy="700" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="700" cy="700" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="riskScore">
         <circle class="hit-area" cx="1010" cy="720" r="20"/>
-        <circle cx="1010" cy="720" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="1010" cy="720" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="inherentRisk">
         <circle class="hit-area" cx="1010" cy="760" r="20"/>
@@ -903,6 +976,18 @@
         <tspan x="775" dy="14">Phase</tspan>
       </text>
       <text x="975" y="265" text-anchor="start" class="station-label label-purple">Indicators</text>
+      <!-- Sienna labels (Threat Origin) -->
+      <text x="420" y="225" text-anchor="middle" class="station-label label-sienna">Origin</text>
+      <text x="335" y="198" text-anchor="end" class="station-label label-sienna">Adversarial</text>
+      <text x="355" y="128" text-anchor="end" class="station-label label-sienna">Accidental</text>
+      <text x="275" y="172" text-anchor="end" class="station-label label-sienna">Structural</text>
+      <text x="245" y="235" text-anchor="end" class="station-label label-sienna">Environmental</text>
+
+      <!-- Gold label (Business Objectives) -->
+      <text x="95" y="150" text-anchor="start" class="station-label label-gold">
+        <tspan x="95" dy="0">Business</tspan>
+        <tspan x="95" dy="14">Objectives</tspan>
+      </text>
 
       <!-- Cyan labels (System Model) -->
       <text x="105" y="280" text-anchor="end" class="station-label label-cyan">Assumptions</text>
@@ -939,7 +1024,7 @@
       </text>
 
       <!-- Orange labels -->
-      <text x="415" y="545" text-anchor="end" class="station-label label-orange">Methodologies</text>
+      <text x="415" y="545" text-anchor="end" class="station-label label-red">Methodologies</text>
       <text x="1010" y="228" text-anchor="middle" class="station-label label-orange">Actor</text>
       <text x="1140" y="260" text-anchor="start" class="station-label label-orange">
         <tspan x="1140" dy="0">Threat</tspan>
@@ -950,15 +1035,15 @@
         <tspan x="1235" dy="14">Vector</tspan>
       </text>
       <text x="1345" y="485" text-anchor="start" class="station-label label-orange">Exploitability</text>
-      <text x="1235" y="535" text-anchor="start" class="station-label label-orange">Likelihood</text>
-      <text x="1285" y="608" text-anchor="start" class="station-label label-orange">Impact</text>
+      <text x="1235" y="535" text-anchor="start" class="station-label label-red">Likelihood</text>
+      <text x="1285" y="608" text-anchor="start" class="station-label label-red">Impact</text>
 
       <!-- Gray labels (Risk Management) -->
-      <text x="680" y="685" text-anchor="middle" class="station-label label-orange" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
+      <text x="680" y="685" text-anchor="middle" class="station-label label-red" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
         <tspan x="680" dy="0">Affected</tspan>
         <tspan x="680" dy="14">Assets</tspan>
       </text>
-      <text x="1025" y="715" text-anchor="start" class="station-label label-orange">
+      <text x="1025" y="715" text-anchor="start" class="station-label label-red">
         <tspan x="1025" dy="0">Risk</tspan>
         <tspan x="1025" dy="14">Score</tspan>
       </text>
@@ -1059,6 +1144,24 @@
                 stroke-dasharray="10,7" opacity="0.35"
                 stroke-linecap="round" stroke-linejoin="round"/>
 
+      <!-- threat.relatedBusinessObjectives — refs from threat to business objectives -->
+      <polyline points="620,360 400,280 200,200 80,160"
+                stroke="#9B7B2C" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- risk.relatedBusinessObjectives — refs from risk to business objectives -->
+      <polyline points="900,750 600,500 300,300 80,160"
+                stroke="#9B7B2C" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
+      <!-- useCase.businessObjectives — refs from use cases to business objectives -->
+      <polyline points="110,660 95,400 80,160"
+                stroke="#9B7B2C" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"/>
+
       <!-- ============================================ -->
       <!-- ROUTE ANIMATION OVERLAY                     -->
       <!-- ============================================ -->
@@ -1092,6 +1195,8 @@
     <div class="phase-dot"></div>
     <div class="phase-dot"></div>
     <div class="phase-dot"></div>
+    <div class="phase-dot"></div>
+    <div class="phase-dot"></div>
   </div>
   <button class="phase-advance" id="phase-next">Next →</button>
 </div>
@@ -1107,6 +1212,16 @@
 
 <script>
 const stationData = {
+  // ── Gold — Business Objectives ────────────────────
+  businessObjectives: {
+    title: "Business Objectives",
+    line: "Business Objectives",
+    color: "#9B7B2C",
+    desc: "A collection of reusable business goals that the organization is trying to achieve. Threats, risks, use cases, and requirements trace back to these objectives. Anchors risk-centric analysis such as PASTA stage 1, where threats and risks are evaluated against what the organization needs to protect.",
+    props: ["bom-ref", "name", "description", "criticality", "owner", "externalReferences"],
+    example: "Protect customer PII for GDPR/CCPA compliance; Ensure 99.9% uptime for payment processing to meet SLA commitments"
+  },
+
   // ── Purple — Threat Intelligence ──────────────────
   blueprint: {
     title: "Blueprint",
@@ -1126,9 +1241,9 @@ const stationData = {
   },
   threat: {
     title: "Threat",
-    line: "Hub — Intelligence / Scenario",
+    line: "Hub — Intelligence / Attack Modeling",
     color: "#222",
-    desc: "A specific threat to the system. Hub connecting threat intelligence (purple) and threat scenarios (orange).",
+    desc: "A documented threat describing what can go wrong, independent of any specific actor or occurrence. Hub connecting threat intelligence (purple) to attack modeling (orange).",
     props: ["name", "origin", "categories (STRIDE, LINDDUN, MAESTRO, MITRE ATT&CK)", "source"],
     example: "SQL injection in product search allowing data exfiltration (STRIDE: Tampering, Information Disclosure)"
   },
@@ -1171,6 +1286,46 @@ const stationData = {
     desc: "Indicators of Compromise (IoC), Indicators of Attack (IoA), and detection signatures associated with threats.",
     props: ["type (IoC/IoA/signature)", "value", "pattern", "source", "confidence"],
     example: "IoC: Unusual outbound data transfer volume to unknown IP; IoA: repeated UNION SELECT in query logs"
+  },
+  threatOrigin: {
+    title: "Threat Origin",
+    line: "Threat Origin",
+    color: "#A0522D",
+    desc: "The nature of the threat source (NIST SP 800-30). Classifies what gives rise to a threat — not all threats come from attackers. Origin shapes how you assess likelihood, model scenarios, and choose controls.",
+    props: ["adversarial", "accidental", "structural", "environmental", "custom"],
+    example: "A data center outage caused by flooding is origin: environmental; a misconfigured firewall rule is origin: accidental"
+  },
+  originAdversarial: {
+    title: "Adversarial",
+    line: "Threat Origin",
+    color: "#A0522D",
+    desc: "Threat origin: an adversary acting with intent — an individual, group, organization, or nation state. Covers the traditional attacker-driven threat landscape: hackers, insider threats, APT groups, and state-sponsored actors.",
+    props: ["type: adversarial"],
+    example: "APT group targeting financial sector via spear-phishing; disgruntled employee exfiltrating trade secrets"
+  },
+  originAccidental: {
+    title: "Accidental",
+    line: "Threat Origin",
+    color: "#A0522D",
+    desc: "Threat origin: an erroneous action taken without malicious intent — a mistake by a privileged user or administrator. Covers human error, misconfigurations, and unintended consequences of legitimate actions.",
+    props: ["type: accidental"],
+    example: "Admin accidentally deletes production database; developer pushes API keys to a public repository"
+  },
+  originStructural: {
+    title: "Structural",
+    line: "Threat Origin",
+    color: "#A0522D",
+    desc: "Threat origin: a failure of equipment, software, or environmental controls — resource exhaustion, hardware wear-out, or expiry of a component. Covers systemic failures not caused by people or external events.",
+    props: ["type: structural"],
+    example: "SSD firmware bug causing silent data corruption; TLS certificate expiry taking down an API; memory leak causing OOM crash"
+  },
+  originEnvironmental: {
+    title: "Environmental",
+    line: "Threat Origin",
+    color: "#A0522D",
+    desc: "Threat origin: a natural or human-made event outside the control of the organization — fire, flood, earthquake, pandemic, or wide-area infrastructure outage. Covers force majeure and external disruptions.",
+    props: ["type: environmental"],
+    example: "Tsunami destroys primary data center; regional power grid failure; pandemic forcing abrupt shift to remote operations"
   },
 
   // ── Cyan — System Model / Use Cases ───────────────
@@ -1263,10 +1418,10 @@ const stationData = {
     example: "Authenticated Customer — web/mobile access, limited to own account data; Admin — internal zone, full CRUD"
   },
 
-  // ── Orange — Attack Modeling (merged into Threat Scenario) ──
+  // ── Orange — Attack Modeling ──
   attackTrees: {
     title: "Attack Trees",
-    line: "Threat Scenario",
+    line: "Attack Modeling",
     color: "#d4721a",
     desc: "AND/OR decomposition of attack goals into sub-goals, representing structured threat analysis.",
     props: ["goal", "operator (AND/OR)", "children", "likelihood", "cost", "difficulty"],
@@ -1274,7 +1429,7 @@ const stationData = {
   },
   abuseCases: {
     title: "Abuse Cases",
-    line: "Threat Scenario",
+    line: "Attack Modeling",
     color: "#d4721a",
     desc: "Adversarial counterpart to use cases — describes how an attacker misuses system functionality.",
     props: ["name", "abuser", "targets", "mainFlow", "preconditions", "consequences"],
@@ -1282,7 +1437,7 @@ const stationData = {
   },
   attackPaths: {
     title: "Attack Paths",
-    line: "Threat Scenario",
+    line: "Attack Modeling",
     color: "#d4721a",
     desc: "Chained multi-step attack sequences from source to destination, including boundary crossings.",
     props: ["name", "source", "destination", "steps", "boundaryCrossings", "prerequisites"],
@@ -1290,25 +1445,25 @@ const stationData = {
   },
   trustBoundaries: {
     title: "Trust Boundaries",
-    line: "Threat Scenario",
+    line: "Attack Modeling",
     color: "#d4721a",
     desc: "Annotated trust boundary definitions with trust levels, associated threats, and protective controls.",
     props: ["name", "trustLevel", "threats", "controls", "assets", "crossingPolicy"],
     example: "Internet → DMZ boundary: WAF required, input validation enforced, DDoS protection active"
   },
 
-  // ── Orange — Threat Scenario ──────────────────────
+  // ── Red — Scenario Assessment ─────────────────────
   methodologies: {
     title: "Methodologies",
-    line: "Threat Scenario",
-    color: "#d4721a",
+    line: "Scenario Assessment",
+    color: "#b7472a",
     desc: "Threat modeling methodologies applied to the scenario — STRIDE, LINDDUN, MAESTRO, PASTA, VAST, or custom frameworks.",
     props: ["name", "type (STRIDE/LINDDUN/MAESTRO/PASTA/VAST/custom)", "scope", "coverage"],
     example: "STRIDE applied to checkout data flow; MITRE ATT&CK mapped for detection coverage analysis"
   },
   actor: {
     title: "Actor",
-    line: "Threat Scenario",
+    line: "Attack Modeling",
     color: "#d4721a",
     desc: "The party (human or system) acting in a threat scenario — references a party defined in definitions.parties (distinct from blueprint actors).",
     props: ["party (ref)", "description", "permissions", "zone"],
@@ -1316,7 +1471,7 @@ const stationData = {
   },
   threatProfile: {
     title: "Threat Profile",
-    line: "Threat Scenario",
+    line: "Attack Modeling",
     color: "#d4721a",
     desc: "Reusable profile describing the durable characteristics of an actor that may pose a threat — sophistication, resources, and skill set.",
     props: ["name", "description", "sophistication", "resources", "skillSet"],
@@ -1324,7 +1479,7 @@ const stationData = {
   },
   attackVector: {
     title: "Attack Vector",
-    line: "Threat Scenario",
+    line: "Attack Modeling",
     color: "#d4721a",
     desc: "How the attack is delivered — network context, complexity, required privileges, and scope change.",
     props: ["type (network/adjacent/local/physical)", "complexity", "privileges", "userInteraction", "scope"],
@@ -1332,7 +1487,7 @@ const stationData = {
   },
   exploitability: {
     title: "Exploitability",
-    line: "Threat Scenario",
+    line: "Attack Modeling",
     color: "#d4721a",
     desc: "Maturity and feasibility of exploiting the threat — from theoretical to weaponized.",
     props: ["level", "complexity", "skillRequired", "automatable"],
@@ -1340,24 +1495,24 @@ const stationData = {
   },
   threatScenario: {
     title: "Threat Scenario",
-    line: "Hub — Scenario / Risk",
+    line: "Hub — Attack Modeling / Scenario Assessment",
     color: "#222",
-    desc: "A concrete scenario combining a threat with actor, vector, and assessed likelihood/impact. Hub linking threat analysis to risk assessment.",
+    desc: "A specific realization of a threat, in which an actor seeks to cause harm. References the threat it realizes and carries the scenario-specific assessment (likelihood, impact, risk score). Hub linking attack modeling (orange) to scenario assessment (red).",
     props: ["name", "threats", "actor", "threatProfile", "attackVector", "exploitability", "likelihood", "impact", "riskScore", "affectedAssets"],
     example: "External attacker exploits SQL injection in product search to extract 2M customer PII records via blind injection"
   },
   likelihood: {
     title: "Likelihood",
-    line: "Threat Scenario",
-    color: "#d4721a",
+    line: "Scenario Assessment",
+    color: "#b7472a",
     desc: "Probability assessment of the scenario occurring — qualitative level, numeric score, or statistical probability.",
     props: ["level (very-low → certain)", "score", "probability", "frequency", "factors"],
     example: "High (score: 8/10) — public exploit exists, internet-facing endpoint, high-value target for attackers"
   },
   impact: {
     title: "Impact",
-    line: "Threat Scenario",
-    color: "#d4721a",
+    line: "Scenario Assessment",
+    color: "#b7472a",
     desc: "Severity of consequences if the scenario materializes — across confidentiality, integrity, availability, and more.",
     props: ["level (negligible → catastrophic)", "categories", "score", "factors", "quantification"],
     example: "Critical — 2M customer records exposed, estimated $4.5M regulatory fines, severe reputational damage"
@@ -1366,8 +1521,8 @@ const stationData = {
   // ── Gray — Risk Management ────────────────────────
   affectedAssets: {
     title: "Affected Assets",
-    line: "Threat Scenario",
-    color: "#d4721a",
+    line: "Scenario Assessment",
+    color: "#b7472a",
     desc: "References to the assets affected in this threat scenario. A property of threat and threatScenario — not a risk property.",
     props: ["bom-ref links to components", "bom-ref links to services", "bom-ref links to data stores"],
     example: "User database (PostgreSQL), Search Service API, Customer PII dataset"
@@ -1382,8 +1537,8 @@ const stationData = {
   },
   riskScore: {
     title: "Risk Score",
-    line: "Threat Scenario",
-    color: "#d4721a",
+    line: "Scenario Assessment",
+    color: "#b7472a",
     desc: "Quantified risk rating on the threat scenario using a chosen methodology. A property of threatScenario only — the risk object uses separate inherentRisk/residualRisk/targetRisk rating objects instead.",
     props: ["level (info → critical)", "score", "vector", "methodology (DREAD, FAIR, OWASP, etc.)"],
     example: "OWASP Risk Rating: Critical (Likelihood: High x Impact: Critical = 9.2/10)"
@@ -1648,6 +1803,14 @@ document.querySelectorAll('.station-dot, .hub-circle').forEach(stationElement =>
 const routePhases = [
   {
     phaseNumber: 1,
+    title: "Define Business Goals",
+    desc: "Business objectives — the organizational goals that threats and risks are evaluated against (PASTA stage 1)",
+    color: "#9B7B2C",
+    waypoints: [[80,160]],
+    branchStations: []
+  },
+  {
+    phaseNumber: 2,
     title: "Know Your System",
     desc: "Blueprint defines the system architecture — assets, zones, flows, and actors",
     color: "#2980b9",
@@ -1655,7 +1818,7 @@ const routePhases = [
     branchStations: ["assumptions","assets","dataStores","dataSets","relationships","zones","boundaries","flows","useCases","behaviors","blueprintActors"]
   },
   {
-    phaseNumber: 2,
+    phaseNumber: 3,
     title: "Catalog the Threats",
     desc: "Threat intelligence — weaknesses, vulnerabilities, attack patterns, kill chain",
     color: "#3b2d8e",
@@ -1663,7 +1826,15 @@ const routePhases = [
     branchStations: ["weakness","vulnerabilities","capec","killChain","indicators"]
   },
   {
-    phaseNumber: 3,
+    phaseNumber: 4,
+    title: "Classify the Origin",
+    desc: "Threat source classification (NIST SP 800-30) — not all threats come from attackers",
+    color: "#A0522D",
+    waypoints: [[620,360],[560,300],[420,240]],
+    branchStations: ["originAdversarial","originAccidental","originStructural","originEnvironmental"]
+  },
+  {
+    phaseNumber: 5,
     title: "Model the Attacks",
     desc: "Structured attack analysis — trees, abuse cases, paths, trust boundaries",
     color: "#d4721a",
@@ -1671,15 +1842,15 @@ const routePhases = [
     branchStations: ["attackTrees","abuseCases","attackPaths","trustBoundaries"]
   },
   {
-    phaseNumber: 4,
+    phaseNumber: 6,
     title: "Build Scenarios",
     desc: "Concrete threat scenarios — actors, vectors, exploitability, likelihood, impact",
-    color: "#d4721a",
+    color: "#b7472a",
     waypoints: [[620,360],[580,420],[540,490],[540,590]],
     branchStations: ["actor","threatProfile","attackVector","exploitability","methodologies","likelihood","impact","riskScore"]
   },
   {
-    phaseNumber: 5,
+    phaseNumber: 7,
     title: "Assess the Risk",
     desc: "Risk ratings — inherent, residual, and target risk with formal assessment",
     color: "#6b6b6b",
@@ -1687,7 +1858,7 @@ const routePhases = [
     branchStations: ["inherentRisk","residualRisk","targetRisk","assessment"]
   },
   {
-    phaseNumber: 6,
+    phaseNumber: 8,
     title: "Apply Controls",
     desc: "Security controls — effectiveness, implementation traceability",
     color: "#27ae60",
@@ -1695,7 +1866,7 @@ const routePhases = [
     branchStations: ["effectiveness","appliesTo","implementedBy"]
   },
   {
-    phaseNumber: 7,
+    phaseNumber: 9,
     title: "Verify Governance",
     desc: "Requirements chain — controls satisfy requirements, verified by acceptance criteria",
     color: "#16a085",
@@ -1721,6 +1892,8 @@ let currentPhaseIndex = -1;
 let animationFrameId = null;
 let trailPoints = [];
 let waitingForAdvance = false;
+let branchIndex = -1;
+let steppingBranches = false;
 
 function setTrainPosition(positionX, positionY) {
   trainDot.setAttribute('cx', positionX);
@@ -1749,16 +1922,23 @@ function updatePhaseDots(activePhaseIndex) {
   });
 }
 
-function pulseStations(stationIdList) {
-  stationIdList.forEach((stationId, stationIndex) => {
-    const stationElement = document.querySelector(`[data-station="${stationId}"]`);
-    if (!stationElement) return;
-    setTimeout(() => {
-      stationElement.classList.add('station-active');
-      stationElement.classList.add('station-visited');
-      setTimeout(() => stationElement.classList.remove('station-active'), 900);
-    }, stationIndex * 120);
-  });
+function visitBranchStation(stationId) {
+  const stationElement = document.querySelector(`[data-station="${stationId}"]`);
+  if (!stationElement) return;
+  stationElement.classList.add('station-active');
+  stationElement.classList.add('station-visited');
+  setTimeout(() => stationElement.classList.remove('station-active'), 900);
+}
+
+function updateBranchDisplay(phaseData) {
+  const total = phaseData.branchStations.length;
+  if (branchIndex < total) {
+    const stationId = phaseData.branchStations[branchIndex];
+    const stationInfo = stationData[stationId];
+    const stationLabel = stationInfo ? stationInfo.title : stationId;
+    phaseDescDisplay.textContent = `${branchIndex + 1}/${total} — ${stationLabel}`;
+    phaseNextBtn.textContent = branchIndex < total - 1 ? 'Next →' : 'Continue →';
+  }
 }
 
 function markMainStationVisited(positionX, positionY) {
@@ -1847,13 +2027,32 @@ function showPhase(phaseIndex) {
   }
 
   animateAlongWaypoints(phaseData.waypoints, 150, () => {
-    pulseStations(phaseData.branchStations);
+    if (phaseData.branchStations.length > 0) {
+      steppingBranches = true;
+      branchIndex = 0;
+      visitBranchStation(phaseData.branchStations[0]);
+      updateBranchDisplay(phaseData);
+    } else {
+      phaseNextBtn.textContent = currentPhaseIndex >= routePhases.length - 1 ? 'Done ✓' : 'Next →';
+    }
     waitingForAdvance = true;
   });
 }
 
 function advancePhase() {
   if (!routeActive || !waitingForAdvance) return;
+
+  const phaseData = routePhases[currentPhaseIndex];
+
+  if (steppingBranches && branchIndex < phaseData.branchStations.length - 1) {
+    branchIndex++;
+    visitBranchStation(phaseData.branchStations[branchIndex]);
+    updateBranchDisplay(phaseData);
+    return;
+  }
+
+  steppingBranches = false;
+  branchIndex = -1;
   waitingForAdvance = false;
 
   if (currentPhaseIndex >= routePhases.length - 1) {
@@ -1883,6 +2082,8 @@ function startRoute() {
 function resetRoute() {
   routeActive = false;
   waitingForAdvance = false;
+  steppingBranches = false;
+  branchIndex = -1;
   currentPhaseIndex = -1;
 
   if (animationFrameId) {
@@ -2094,13 +2295,21 @@ const lineFilterMap = {
     stations: ['threatModel', 'weakness', 'vulnerabilities', 'capec', 'killChain', 'indicators'],
     hubs: ['blueprint', 'threat']
   },
+  sienna: {
+    stations: ['threatOrigin', 'originAdversarial', 'originAccidental', 'originStructural', 'originEnvironmental'],
+    hubs: ['threat']
+  },
   cyan: {
     stations: ['assumptions', 'assets', 'dataStores', 'dataSets', 'relationships', 'zones', 'boundaries', 'flows', 'useCases', 'behaviors', 'blueprintActors'],
     hubs: ['blueprint']
   },
   orange: {
-    stations: ['methodologies', 'actor', 'threatProfile', 'attackVector', 'exploitability', 'likelihood', 'impact', 'riskScore', 'attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries', 'affectedAssets'],
+    stations: ['actor', 'threatProfile', 'attackVector', 'exploitability', 'attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries'],
     hubs: ['threat', 'threatScenario']
+  },
+  red: {
+    stations: ['methodologies', 'likelihood', 'impact', 'riskScore', 'affectedAssets'],
+    hubs: ['threatScenario']
   },
   gray: {
     stations: ['inherentRisk', 'residualRisk', 'targetRisk', 'riskResponse', 'assessment', 'riskAppetite'],
@@ -2113,12 +2322,17 @@ const lineFilterMap = {
   teal: {
     stations: ['satisfies', 'requirements', 'acceptanceCriteria'],
     hubs: ['control']
+  },
+  gold: {
+    stations: ['businessObjectives'],
+    hubs: []
   }
 };
 
 const lineColorHexMap = {
-  purple: '#3b2d8e', cyan: '#2980b9',
-  orange: '#d4721a', gray: '#6b6b6b', green: '#27ae60', teal: '#16a085'
+  purple: '#3b2d8e', sienna: '#A0522D', cyan: '#2980b9',
+  orange: '#d4721a', red: '#b7472a', gray: '#6b6b6b', green: '#27ae60', teal: '#16a085',
+  gold: '#9B7B2C'
 };
 
 let activeLineFilter = null;
