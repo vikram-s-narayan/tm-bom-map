@@ -35,18 +35,19 @@
     letter-spacing: 0.5px;
     white-space: nowrap;
     flex-shrink: 0;
+    line-height: 1.1;
   }
 
   #header .subtitle {
-    font-size: 12px;
+    font-size: 10px;
     color: #aaa;
-    margin-left: auto;
+    letter-spacing: 0.3px;
   }
 
   .legend {
     display: flex;
-    gap: 14px;
-    margin-left: 32px;
+    gap: 8px;
+    margin-left: 24px;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -56,14 +57,15 @@
   .legend-item {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 11px;
+    gap: 4px;
+    font-size: 10px;
     color: #ccc;
     cursor: pointer;
-    padding: 4px 10px;
+    padding: 3px 7px;
     border-radius: 4px;
     transition: background 0.2s, color 0.2s;
     user-select: none;
+    white-space: nowrap;
   }
 
   .legend-item:hover {
@@ -327,7 +329,10 @@
 <body>
 
 <div id="header">
-  <h1>Threat Modeling BOM — Metro Map</h1>
+  <div style="flex-shrink:0;">
+    <h1>Threat Modeling BOM — Metro Map</h1>
+    <div class="subtitle">CycloneDX 2.0</div>
+  </div>
   <div class="legend">
     <div class="legend-item active" data-line="all">
       <div class="legend-swatch" style="background:linear-gradient(90deg,#9B7B2C,#3b2d8e,#A0522D,#d4721a,#b7472a,#6b6b6b,#27ae60,#16a085,#2980b9);"></div>
@@ -335,27 +340,27 @@
     </div>
     <div class="legend-item" data-line="gold">
       <div class="legend-swatch" style="background:#9B7B2C;"></div>
-      Business Objectives
+      Objectives
     </div>
     <div class="legend-item" data-line="purple">
       <div class="legend-swatch" style="background:#3b2d8e;"></div>
-      Threat Intelligence
+      Intelligence
     </div>
     <div class="legend-item" data-line="orange">
       <div class="legend-swatch" style="background:#d4721a;"></div>
-      Attack Modeling
+      Attack
     </div>
     <div class="legend-item" data-line="red">
       <div class="legend-swatch" style="background:#b7472a;"></div>
-      Scenario Assessment
+      Scenarios
     </div>
     <div class="legend-item" data-line="gray">
       <div class="legend-swatch" style="background:#6b6b6b;"></div>
-      Risk Management
+      Risk
     </div>
     <div class="legend-item" data-line="green">
       <div class="legend-swatch" style="background:#27ae60;"></div>
-      Controls &amp; Mitigation
+      Controls
     </div>
     <div class="legend-item" data-line="teal">
       <div class="legend-swatch" style="background:#16a085;"></div>
@@ -363,14 +368,13 @@
     </div>
     <div class="legend-item" data-line="sienna">
       <div class="legend-swatch" style="background:#A0522D;"></div>
-      Threat Origin
+      Origin
     </div>
     <div class="legend-item" data-line="cyan">
       <div class="legend-swatch" style="background:#2980b9;"></div>
-      System Model
+      System
     </div>
   </div>
-  <div class="subtitle">CycloneDX 2.0</div>
 </div>
 
 <div id="map-container">
@@ -387,7 +391,7 @@
         <rect x="1" y="0" width="6" height="8" rx="1" fill="#6b6b6b"/>
       </marker>
       <marker id="cap-red" markerWidth="8" markerHeight="8" refX="4" refY="4">
-        <rect x="1" y="0" width="6" height="8" rx="1" fill="#d4721a"/>
+        <rect x="1" y="0" width="6" height="8" rx="1" fill="#b7472a"/>
       </marker>
       <marker id="cap-green" markerWidth="8" markerHeight="8" refX="4" refY="4">
         <rect x="1" y="0" width="6" height="8" rx="1" fill="#27ae60"/>
@@ -413,8 +417,12 @@
       <!-- PURPLE LINES — Threat Intelligence           -->
       <!-- ============================================ -->
 
-      <!-- Blueprint → Threat Model → Threat (horizontal) -->
-      <polyline points="200,360 350,360 620,360"
+      <!-- Blueprint → Threats (horizontal) -->
+      <polyline points="200,360 350,360"
+                class="line-purple" stroke-width="8"/>
+
+      <!-- Threats → Threat (dip down then back up to make the hop visible) -->
+      <polyline points="350,360 420,390 500,390 620,360"
                 class="line-purple" stroke-width="8"/>
 
       <!-- Threat → Kill Chain Phase -->
@@ -497,6 +505,18 @@
       <polyline points="140,710 155,735 170,760"
                 class="line-cyan" stroke-width="7"/>
 
+      <!-- Behaviors → Behavior Instances (branch left) -->
+      <polyline points="140,710 50,740"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Behavior Instances → Behavior Graphs (branch further left) -->
+      <polyline points="50,740 -20,770"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Blueprint → Scope (branch up) -->
+      <polyline points="200,360 190,300"
+                class="line-cyan" stroke-width="7"/>
+
       <!-- Blueprint → Assumptions (branch up-left) -->
       <polyline points="200,360 160,325 120,290"
                 class="line-cyan" stroke-width="7"/>
@@ -509,6 +529,14 @@
       <polyline points="0,490 -35,505 -70,520"
                 class="line-cyan" stroke-width="7"/>
 
+      <!-- Blueprint → Components (branch up-right) -->
+      <polyline points="200,360 280,310"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Components → Services (continue up-right) -->
+      <polyline points="280,310 360,280"
+                class="line-cyan" stroke-width="7"/>
+
       <!-- Blueprint → Relationships (branch down-right) -->
       <polyline points="200,360 230,395 260,430"
                 class="line-cyan" stroke-width="7"/>
@@ -517,33 +545,33 @@
       <polyline points="960,380 880,380 620,360"
                 class="line-orange" stroke-width="7"/>
 
-      <!-- Threat → Attack Paths → Trust Boundaries (right and down) -->
-      <polyline points="620,360 720,400 820,440"
+      <!-- Threats → Attack Paths (container-level library) -->
+      <polyline points="350,360 380,440"
                 class="line-orange" stroke-width="7"/>
 
-      <!-- Trust Boundaries -->
-      <polyline points="820,440 920,470"
+      <!-- Attack Paths → Trust Boundaries (container-level library) -->
+      <polyline points="380,440 360,500"
                 class="line-orange" stroke-width="7"/>
 
       <!-- ============================================ -->
-      <!-- ORANGE LINES — Threat Scenario Fan           -->
+      <!-- RED LINES — Threat Scenario Properties       -->
       <!-- ============================================ -->
 
-      <!-- Threat hub → Actor (top fan line) -->
-      <polyline points="620,360 1010,240"
-                class="line-orange" stroke-width="7"/>
+      <!-- Threat Scenario → Actor (scenario-level property) -->
+      <polyline points="540,590 1010,240"
+                class="line-red" stroke-width="7"/>
 
-      <!-- Actor → ThreatProfile 1 (branch from Actor) -->
+      <!-- Actor → Threat Profile (branch from Actor) -->
       <polyline points="1010,240 1130,270"
-                class="line-orange" stroke-width="7"/>
+                class="line-red" stroke-width="7"/>
 
-      <!-- Threat hub → Attack Vector (lower-mid fan) -->
-      <polyline points="620,360 1220,430"
-                class="line-orange" stroke-width="7"/>
+      <!-- Threat Scenario → Attack Vector (scenario-level property) -->
+      <polyline points="540,590 1220,430"
+                class="line-red" stroke-width="7"/>
 
-      <!-- Threat hub → Exploitability (bottom fan) -->
-      <polyline points="620,360 1330,490"
-                class="line-orange" stroke-width="7"/>
+      <!-- Threat Scenario → Exploitability (scenario-level property) -->
+      <polyline points="540,590 1330,490"
+                class="line-red" stroke-width="7"/>
 
       <!-- Threat → Threat Scenario (transition to scenario assessment line) -->
       <polyline points="620,360 540,590"
@@ -573,10 +601,15 @@
       <polyline points="540,590 900,750"
                 stroke="#6b6b6b" stroke-width="5" fill="none"
                 stroke-dasharray="16,8" opacity="0.6"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="red,gray"/>
 
       <!-- Threat Scenario → Risk Score (schema: threatScenario.riskScore) -->
       <polyline points="540,590 1010,720"
+                class="line-red" stroke-width="7"/>
+
+      <!-- Threat Scenario → Risk Attributes (schema: threatScenario.riskAttributes) -->
+      <polyline points="540,590 660,640"
                 class="line-red" stroke-width="7"/>
 
       <!-- Risk hub → Inherent Risk -->
@@ -599,7 +632,8 @@
       <polyline points="900,750 780,870"
                 stroke="#6b6b6b" stroke-width="5" fill="none"
                 stroke-dasharray="16,8" opacity="0.6"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="gray"/>
 
       <!-- Assessment → Risk Appetite -->
       <polyline points="780,870 700,920"
@@ -649,7 +683,7 @@
       <!-- Purple terminals -->
       <rect x="510" y="132" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Weakness CWE -->
       <rect x="680" y="192" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Vulns CVE -->
-      <rect x="732" y="262" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- CAPEC -->
+      <rect x="732" y="262" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Attack Pattern -->
       <rect x="753" y="312" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Kill Chain -->
       <rect x="952" y="262" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Indicators -->
 
@@ -657,22 +691,26 @@
       <rect x="75" y="112" width="10" height="16" rx="2" fill="#9B7B2C"/>   <!-- Business Objectives -->
 
       <!-- Cyan terminals -->
+      <rect x="185" y="292" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Scope -->
       <rect x="112" y="282" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Assumptions -->
       <rect x="-8" y="482" width="10" height="16" rx="2" fill="#2980b9"/>    <!-- Data Stores -->
       <rect x="-78" y="512" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Data Sets -->
+      <rect x="352" y="272" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Services -->
       <rect x="252" y="422" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Relationships -->
       <rect x="162" y="752" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Blueprint Actors -->
+      <rect x="42" y="732" width="10" height="16" rx="2" fill="#2980b9"/>    <!-- Behavior Instances -->
+      <rect x="-28" y="762" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Behavior Graphs -->
 
       <!-- Red terminals -->
       <rect x="952" y="372" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Trees -->
       <rect x="872" y="372" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Abuse Cases -->
-      <rect x="812" y="432" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Paths -->
-      <rect x="912" y="462" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Trust Boundaries -->
+      <rect x="372" y="432" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Paths -->
+      <rect x="352" y="492" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Trust Boundaries -->
 
-      <!-- Orange terminals (Attack Modeling — fan from Threat hub) -->
-      <rect x="1122" y="262" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- ThreatProfile 1 -->
-      <rect x="1212" y="422" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Vector -->
-      <rect x="1322" y="482" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Exploitability -->
+      <!-- Red terminals (Scenario Properties — fan from Threat Scenario hub) -->
+      <rect x="1122" y="262" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Threat Profile -->
+      <rect x="1212" y="422" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Attack Vector -->
+      <rect x="1322" y="482" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Exploitability -->
 
       <!-- Red terminals (Scenario Assessment — fan from Threat Scenario hub) -->
       <rect x="422" y="542" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Methodologies -->
@@ -680,6 +718,7 @@
       <rect x="1262" y="602" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Impact -->
       <rect x="692" y="692" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Affected Assets -->
       <rect x="1002" y="712" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Risk Score -->
+      <rect x="652" y="632" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Risk Attributes -->
 
       <!-- Gray terminals -->
       <rect x="1002" y="752" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Inherent Risk -->
@@ -704,16 +743,17 @@
       <!-- STATION DOTS                                 -->
       <!-- ============================================ -->
 
-      <!-- Purple stations -->
-      <g class="station-dot" data-station="threatModel">
-        <circle class="hit-area" cx="350" cy="360" r="20"/>
-        <circle cx="350" cy="360" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
+      <!-- Threats Hub (Purple + Orange) -->
+      <g class="hub-circle" data-station="threatModel">
+        <circle class="hit-area" cx="350" cy="360" r="24"/>
+        <circle cx="350" cy="360" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
+        <circle cx="350" cy="360" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="killChain">
         <circle class="hit-area" cx="760" cy="320" r="20"/>
         <circle cx="760" cy="320" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
       </g>
-      <g class="station-dot" data-station="capec">
+      <g class="station-dot" data-station="attackPattern">
         <circle class="hit-area" cx="740" cy="270" r="20"/>
         <circle cx="740" cy="270" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
       </g>
@@ -757,6 +797,10 @@
       </g>
 
       <!-- Cyan stations (System Model) -->
+      <g class="station-dot" data-station="scope">
+        <circle class="hit-area" cx="190" cy="300" r="20"/>
+        <circle cx="190" cy="300" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
       <g class="station-dot" data-station="assumptions">
         <circle class="hit-area" cx="120" cy="290" r="20"/>
         <circle cx="120" cy="290" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
@@ -772,6 +816,14 @@
       <g class="station-dot" data-station="dataSets">
         <circle class="hit-area" cx="-70" cy="520" r="20"/>
         <circle cx="-70" cy="520" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="components">
+        <circle class="hit-area" cx="280" cy="310" r="20"/>
+        <circle cx="280" cy="310" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="services">
+        <circle class="hit-area" cx="360" cy="280" r="20"/>
+        <circle cx="360" cy="280" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="relationships">
         <circle class="hit-area" cx="260" cy="430" r="20"/>
@@ -801,6 +853,14 @@
         <circle class="hit-area" cx="170" cy="760" r="20"/>
         <circle cx="170" cy="760" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
       </g>
+      <g class="station-dot" data-station="behaviorInstances">
+        <circle class="hit-area" cx="50" cy="740" r="20"/>
+        <circle cx="50" cy="740" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="behaviorGraphs">
+        <circle class="hit-area" cx="-20" cy="770" r="20"/>
+        <circle cx="-20" cy="770" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
 
       <!-- Orange stations (Attack Modeling, merged) -->
       <g class="station-dot" data-station="attackTrees">
@@ -812,12 +872,12 @@
         <circle cx="880" cy="380" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="attackPaths">
-        <circle class="hit-area" cx="820" cy="440" r="20"/>
-        <circle cx="820" cy="440" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle class="hit-area" cx="380" cy="440" r="20"/>
+        <circle cx="380" cy="440" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="trustBoundaries">
-        <circle class="hit-area" cx="920" cy="470" r="20"/>
-        <circle cx="920" cy="470" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle class="hit-area" cx="360" cy="500" r="20"/>
+        <circle cx="360" cy="500" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
       </g>
 
       <!-- Orange stations -->
@@ -827,20 +887,20 @@
       </g>
       <g class="station-dot" data-station="actor">
         <circle class="hit-area" cx="1010" cy="240" r="20"/>
-        <circle cx="1010" cy="240" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="1010" cy="240" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="threatProfile">
         <circle class="hit-area" cx="1130" cy="270" r="20"/>
-        <circle cx="1130" cy="270" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="1130" cy="270" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
       <!-- threatProfile2 removed (merged into threatProfile) -->
       <g class="station-dot" data-station="attackVector">
         <circle class="hit-area" cx="1220" cy="430" r="20"/>
-        <circle cx="1220" cy="430" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="1220" cy="430" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="exploitability">
         <circle class="hit-area" cx="1330" cy="490" r="20"/>
-        <circle cx="1330" cy="490" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="1330" cy="490" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="likelihood">
         <circle class="hit-area" cx="1220" cy="540" r="20"/>
@@ -859,6 +919,10 @@
       <g class="station-dot" data-station="riskScore">
         <circle class="hit-area" cx="1010" cy="720" r="20"/>
         <circle cx="1010" cy="720" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="riskAttributes">
+        <circle class="hit-area" cx="660" cy="640" r="20"/>
+        <circle cx="660" cy="640" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="inherentRisk">
         <circle class="hit-area" cx="1010" cy="760" r="20"/>
@@ -932,7 +996,7 @@
         <circle cx="620" cy="360" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
       </g>
 
-      <!-- Threat Scenario Hub (Orange + Gray) -->
+      <!-- Threat Scenario Hub (Orange + Red) -->
       <g class="hub-circle" data-station="threatScenario">
         <circle class="hit-area" cx="540" cy="590" r="24"/>
         <circle cx="540" cy="590" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
@@ -968,10 +1032,7 @@
       <text x="1260" y="885" text-anchor="middle" class="station-label" style="font-size:14px; fill:#222;">Control</text>
 
       <!-- Purple labels -->
-      <text x="350" y="390" text-anchor="middle" class="station-label label-purple">
-        <tspan x="350" dy="0">Threats</tspan>
-        <tspan x="350" dy="15">Container</tspan>
-      </text>
+      <text x="350" y="340" text-anchor="middle" class="station-label" style="font-size:14px; fill:#222;">Threats</text>
       <text x="520" y="125" text-anchor="middle" class="station-label label-purple">
         <tspan x="520" dy="0">Weakness</tspan>
         <tspan x="520" dy="14">(CWE)</tspan>
@@ -980,7 +1041,10 @@
         <tspan x="690" dy="0">Vulnerabilities</tspan>
         <tspan x="690" dy="14">(CVE)</tspan>
       </text>
-      <text x="750" y="255" text-anchor="start" class="station-label label-purple">CAPEC</text>
+      <text x="750" y="255" text-anchor="start" class="station-label label-purple">
+        <tspan x="750" dy="0">Attack</tspan>
+        <tspan x="750" dy="14">Pattern</tspan>
+      </text>
       <text x="775" y="315" text-anchor="start" class="station-label label-purple">
         <tspan x="775" dy="0">Kill Chain</tspan>
         <tspan x="775" dy="14">Phase</tspan>
@@ -1000,10 +1064,13 @@
       </text>
 
       <!-- Cyan labels (System Model) -->
+      <text x="175" y="298" text-anchor="end" class="station-label label-cyan">Scope</text>
       <text x="105" y="280" text-anchor="end" class="station-label label-cyan">Assumptions</text>
       <text x="75" y="458" text-anchor="end" class="station-label label-cyan">Assets</text>
       <text x="-15" y="488" text-anchor="end" class="station-label label-cyan">Data Stores</text>
       <text x="-85" y="518" text-anchor="end" class="station-label label-cyan">Data Sets</text>
+      <text x="265" y="305" text-anchor="end" class="station-label label-cyan">Components</text>
+      <text x="375" y="278" text-anchor="start" class="station-label label-cyan">Services</text>
       <text x="275" y="428" text-anchor="start" class="station-label label-cyan">Relationships</text>
       <text x="65" y="508" text-anchor="end" class="station-label label-cyan">Zones</text>
       <text x="60" y="558" text-anchor="end" class="station-label label-cyan">Boundaries</text>
@@ -1013,6 +1080,14 @@
       <text x="145" y="758" text-anchor="end" class="station-label label-cyan">
         <tspan x="150" dy="0">Blueprint</tspan>
         <tspan x="150" dy="14">Actors</tspan>
+      </text>
+      <text x="25" y="738" text-anchor="end" class="station-label label-cyan">
+        <tspan x="25" dy="0">Behavior</tspan>
+        <tspan x="25" dy="14">Instances</tspan>
+      </text>
+      <text x="-45" y="768" text-anchor="end" class="station-label label-cyan">
+        <tspan x="-45" dy="0">Behavior</tspan>
+        <tspan x="-45" dy="14">Graphs</tspan>
       </text>
 
       <!-- Orange labels (Attack Modeling, merged) -->
@@ -1024,27 +1099,27 @@
         <tspan x="880" dy="0">Abuse</tspan>
         <tspan x="880" dy="14">Cases</tspan>
       </text>
-      <text x="805" y="455" text-anchor="middle" class="station-label label-orange" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
-        <tspan x="805" dy="0">Attack</tspan>
-        <tspan x="805" dy="14">Paths</tspan>
+      <text x="395" y="438" text-anchor="start" class="station-label label-orange">
+        <tspan x="395" dy="0">Attack</tspan>
+        <tspan x="395" dy="14">Paths</tspan>
       </text>
-      <text x="935" y="465" text-anchor="start" class="station-label label-orange">
-        <tspan x="935" dy="0">Trust</tspan>
-        <tspan x="935" dy="14">Boundaries</tspan>
+      <text x="345" y="498" text-anchor="end" class="station-label label-orange">
+        <tspan x="345" dy="0">Trust</tspan>
+        <tspan x="345" dy="14">Boundaries</tspan>
       </text>
 
-      <!-- Orange labels -->
+      <!-- Red labels (Scenarios) -->
       <text x="415" y="545" text-anchor="end" class="station-label label-red">Methodologies</text>
-      <text x="1010" y="228" text-anchor="middle" class="station-label label-orange">Actor</text>
-      <text x="1140" y="260" text-anchor="start" class="station-label label-orange">
+      <text x="1010" y="228" text-anchor="middle" class="station-label label-red">Actor</text>
+      <text x="1140" y="260" text-anchor="start" class="station-label label-red">
         <tspan x="1140" dy="0">Threat</tspan>
         <tspan x="1140" dy="14">Profile</tspan>
       </text>
-      <text x="1235" y="425" text-anchor="start" class="station-label label-orange">
+      <text x="1235" y="425" text-anchor="start" class="station-label label-red">
         <tspan x="1235" dy="0">Attack</tspan>
         <tspan x="1235" dy="14">Vector</tspan>
       </text>
-      <text x="1345" y="485" text-anchor="start" class="station-label label-orange">Exploitability</text>
+      <text x="1345" y="485" text-anchor="start" class="station-label label-red">Exploitability</text>
       <text x="1235" y="535" text-anchor="start" class="station-label label-red">Likelihood</text>
       <text x="1285" y="608" text-anchor="start" class="station-label label-red">Impact</text>
 
@@ -1056,6 +1131,10 @@
       <text x="1025" y="715" text-anchor="start" class="station-label label-red">
         <tspan x="1025" dy="0">Risk</tspan>
         <tspan x="1025" dy="14">Score</tspan>
+      </text>
+      <text x="640" y="635" text-anchor="end" class="station-label label-red" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
+        <tspan x="640" dy="0">Risk</tspan>
+        <tspan x="640" dy="14">Attributes</tspan>
       </text>
       <text x="1025" y="755" text-anchor="start" class="station-label label-gray">
         <tspan x="1025" dy="0">Inherent</tspan>
@@ -1104,73 +1183,99 @@
       <polyline points="200,360 280,520 500,740 800,900 1100,970 1300,1000"
                 stroke="#2980b9" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="cyan,teal"/>
 
       <!-- threat.mitigations — refs from threats to controls -->
       <polyline points="620,360 800,580 1050,800 1260,900"
                 stroke="#27ae60" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="purple,green"/>
+
+      <!-- attackPath.realizes — refs from attack paths to threats -->
+      <polyline points="380,440 500,420 620,360"
+                stroke="#d4721a" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="orange,purple"/>
 
       <!-- threat.behaviors — purple dashed to cyan Behaviors -->
       <polyline points="620,360 380,540 140,710"
                 stroke="#3b2d8e" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="purple,cyan"/>
 
-      <!-- risk.affects — refs from risk back to components/services/datasets (Fix #3) -->
+      <!-- risk.affects — refs from risk back to components/services/datasets -->
       <polyline points="900,750 600,620 300,500 100,460"
                 stroke="#6b6b6b" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="gray,cyan"/>
 
-      <!-- risk.relatedVulnerabilities — refs from risk to vulnerabilities (Fix #4) -->
+      <!-- threat.affectedAssets — refs from threat to affected assets -->
+      <polyline points="620,360 660,530 700,700"
+                stroke="#3b2d8e" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="purple,red"/>
+
+      <!-- risk.relatedVulnerabilities — refs from risk to vulnerabilities -->
       <polyline points="900,750 920,550 830,380 690,200"
                 stroke="#6b6b6b" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="gray,purple"/>
 
-      <!-- risk.relatedWeaknesses — refs from risk to weaknesses (Fix #4) -->
+      <!-- risk.relatedWeaknesses — refs from risk to weaknesses -->
       <polyline points="900,750 780,520 630,300 520,140"
                 stroke="#6b6b6b" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="gray,purple"/>
 
-      <!-- risk.relatedRequirements — refs from risk to requirements (Fix #4) -->
+      <!-- risk.relatedRequirements — refs from risk to requirements -->
       <polyline points="900,750 1050,850 1200,950 1300,1000"
                 stroke="#6b6b6b" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="gray,teal"/>
 
-      <!-- control.appliesTo — refs back to blueprint assets/zones/boundaries (Fix #7) -->
+      <!-- control.appliesTo — refs back to blueprint assets/zones/boundaries -->
       <polyline points="1160,940 900,920 500,750 200,500 100,460"
                 stroke="#27ae60" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="green,cyan"/>
 
-      <!-- control.implementedBy — refs back to blueprint components/services (Fix #7) -->
+      <!-- control.implementedBy — refs back to blueprint components/services -->
       <polyline points="1150,990 800,980 400,820 150,650 200,360"
                 stroke="#27ae60" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="green,cyan"/>
 
       <!-- threat.relatedBusinessObjectives — refs from threat to business objectives -->
       <polyline points="620,360 400,280 200,200 80,160"
                 stroke="#9B7B2C" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="purple,gold"/>
 
       <!-- risk.relatedBusinessObjectives — refs from risk to business objectives -->
       <polyline points="900,750 600,500 300,300 80,160"
                 stroke="#9B7B2C" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="gray,gold"/>
 
       <!-- useCase.businessObjectives — refs from use cases to business objectives -->
       <polyline points="110,660 95,400 80,160"
                 stroke="#9B7B2C" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
-                stroke-linecap="round" stroke-linejoin="round"/>
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="cyan,gold"/>
 
       <!-- ============================================ -->
       <!-- ROUTE ANIMATION OVERLAY                     -->
@@ -1227,8 +1332,8 @@ const stationData = {
     title: "Business Objectives",
     line: "Business Objectives",
     color: "#9B7B2C",
-    desc: "A collection of reusable business goals that the organization is trying to achieve. Threats, risks, use cases, and requirements trace back to these objectives. Anchors risk-centric analysis such as PASTA stage 1, where threats and risks are evaluated against what the organization needs to protect.",
-    props: ["bom-ref", "name", "description", "criticality", "owner", "externalReferences"],
+    desc: "A collection of reusable business goals that the organization is trying to achieve. Defined under definitions.businessObjectives and referenced by bom-ref from threats, risks, and use cases. Anchors risk-centric analysis such as PASTA stage 1, where threats and risks are evaluated against what the organization needs to protect.",
+    props: ["bom-ref", "name", "description", "criticality", "owner", "externalReferences", "properties"],
     example: "Protect customer PII for GDPR/CCPA compliance; Ensure 99.9% uptime for payment processing to meet SLA commitments"
   },
 
@@ -1238,14 +1343,22 @@ const stationData = {
     line: "Hub — System Model / Threat Intelligence",
     color: "#222",
     desc: "System architecture model — defines assets, zones, boundaries, flows, actors, data stores, relationships, and assumptions that form the attack surface. Hub connecting the system model (cyan) to threat intelligence (purple).",
-    props: ["name", "modelTypes", "assets", "zones", "boundaries", "flows", "actors", "dataStores", "dataSets", "relationships", "assumptions"],
+    props: ["bom-ref", "name", "description", "metadata", "modelTypes", "scope", "assets", "behaviors", "dataStores", "dataSets", "zones", "boundaries", "flows", "relationships", "actors", "assumptions", "visualizations", "useCases", "requirements", "externalReferences", "properties"],
     example: "E-commerce platform with payment gateway, user database, CDN, and third-party shipping API"
   },
+  scope: {
+    title: "Scope",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Specifies what is included and excluded from the blueprint model, establishing the boundaries within which the modelling and analysis is performed. Explicitly lists included and excluded components via bom-ref/bom-link references.",
+    props: ["bom-ref", "name", "description", "boundaries", "includedComponents", "excludedComponents", "properties"],
+    example: "Scope: 'Customer-facing APIs' — includes Payment Service, Search Service, Auth Service; excludes internal batch jobs and data warehouse ETL"
+  },
   threatModel: {
-    title: "Threats Container",
-    line: "Threat Intelligence",
-    color: "#3b2d8e",
-    desc: "The top-level 'threats' container in the BOM — holds threats, scenarios, attack patterns, attack trees, abuse cases, trust boundaries, and methodologies. Not a standalone schema object; this IS the threat model.",
+    title: "Threats",
+    line: "Hub — Threat Intelligence / Attack Modeling",
+    color: "#222",
+    desc: "The top-level 'threats' object in the BOM — holds threats, scenarios, attack patterns, attack trees, abuse cases, trust boundaries, and methodologies. This is the threat model.",
     props: ["threats", "scenarios", "attackPatterns", "attackTrees", "attackPaths", "abuseCases", "trustBoundaries", "methodologies"],
     example: "STRIDE analysis of the checkout flow covering payment, authentication, and order services"
   },
@@ -1254,39 +1367,39 @@ const stationData = {
     line: "Hub — Intelligence / Attack Modeling",
     color: "#222",
     desc: "A documented threat describing what can go wrong, independent of any specific actor or occurrence. Hub connecting threat intelligence (purple) to attack modeling (orange).",
-    props: ["name", "origin", "categories (STRIDE, LINDDUN, MAESTRO, MITRE ATT&CK)", "source"],
+    props: ["bom-ref", "name", "description", "source", "origin", "categories", "weaknesses", "relatedVulnerabilities", "attackPatterns", "attackTrees", "abuseCases", "killChainPhase", "behaviors", "indicators", "affectedAssets", "relatedBusinessObjectives", "mitigations", "externalReferences", "properties"],
     example: "SQL injection in product search allowing data exfiltration (STRIDE: Tampering, Information Disclosure)"
   },
   weakness: {
     title: "Weakness (CWE)",
     line: "Threat Intelligence",
     color: "#3b2d8e",
-    desc: "Common Weakness Enumeration — a category of software/hardware weakness that can lead to vulnerabilities.",
-    props: ["cweId", "description"],
-    example: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+    desc: "A classification of an underlying weakness — either by CWE identifier or free-text name with optional description. Referenced in the threat's weaknesses array. Exploitability and affected scope are expressed by the referencing vulnerability or threat, not on the weakness itself.",
+    props: ["oneOf: { bom-ref?, cweId (integer) } or { bom-ref?, name, description? }"],
+    example: "{ cweId: 89 } — CWE-89: Improper Neutralization of Special Elements used in an SQL Command; or custom: { name: 'Insecure Defaults', description: '...' }"
   },
   vulnerabilities: {
     title: "Vulnerabilities (CVE)",
     line: "Threat Intelligence",
     color: "#3b2d8e",
     desc: "Known vulnerabilities (CVE) in components that a threat may exploit.",
-    props: ["id (CVE)", "source", "ratings", "advisories", "affects"],
+    props: ["bom-ref", "id", "source", "ratings", "weaknesses", "description", "detail", "recommendation", "advisories", "analysis", "affects"],
     example: "CVE-2023-34362: MOVEit Transfer SQL injection vulnerability (CVSS 9.8)"
   },
-  capec: {
-    title: "CAPEC",
+  attackPattern: {
+    title: "Attack Pattern",
     line: "Threat Intelligence",
     color: "#3b2d8e",
-    desc: "Common Attack Pattern Enumeration & Classification — standardized descriptions of attack methods.",
-    props: ["capecId", "attackPattern", "relatedWeaknesses"],
+    desc: "Standardized descriptions of attack methods, typically aligned with CAPEC. Defined in the threats container's attackPatterns library and referenced by bom-ref from individual threats. Each pattern carries a CAPEC ID, prerequisites, techniques, and mitigations.",
+    props: ["bom-ref", "capecId", "name", "description", "prerequisites", "techniques", "mitigations", "examples"],
     example: "CAPEC-66: SQL Injection — manipulating query logic via user-supplied input parameters"
   },
   killChain: {
     title: "Kill Chain Phase",
     line: "Threat Intelligence",
     color: "#3b2d8e",
-    desc: "Stage in the cyber kill chain: from reconnaissance through actions-on-objectives.",
-    props: ["reconnaissance", "weaponization", "delivery", "exploitation", "installation", "C2", "actions-on-objectives"],
+    desc: "Stage in the cyber kill chain — an enum value on a threat or attack path step, from reconnaissance through actions-on-objectives.",
+    props: ["enum: reconnaissance | weaponization | delivery | exploitation | installation | command-and-control | actions-on-objectives"],
     example: "Exploitation — attacker delivers SQL payload through the product search field"
   },
   indicators: {
@@ -1294,7 +1407,7 @@ const stationData = {
     line: "Threat Intelligence",
     color: "#3b2d8e",
     desc: "Indicators of Compromise (IoC), Indicators of Attack (IoA), and detection signatures associated with threats.",
-    props: ["type (IoC/IoA/signature)", "value", "pattern", "source", "confidence"],
+    props: ["compromise (IoC array)", "attack (IoA array)", "signatures (detection signature array: type, value, description, confidence)"],
     example: "IoC: Unusual outbound data transfer volume to unknown IP; IoA: repeated UNION SELECT in query logs"
   },
   threatOrigin: {
@@ -1339,92 +1452,124 @@ const stationData = {
   },
 
   // ── Cyan — System Model / Use Cases ───────────────
+  components: {
+    title: "Components",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Top-level BOM inventory of software and hardware components — libraries, frameworks, applications, containers, devices, and firmware. Referenced by blueprint assets via componentRef and by controls via implementedBy and appliesTo.",
+    props: ["type", "bom-ref", "name", "version", "description", "group", "scope", "parties", "hashes", "licenses", "identifiers", "pedigree", "components", "evidence", "releaseNotes", "tags", "properties", "externalReferences"],
+    example: "Express.js v4.18.2 (library); PostgreSQL v15 (application); nginx:1.25 (container)"
+  },
+  services: {
+    title: "Services",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Top-level BOM inventory of services — APIs, microservices, and cloud services that the system depends on or exposes. Each service can declare endpoints, trust boundary crossings, and data classifications.",
+    props: ["bom-ref", "provider", "group", "name", "version", "description", "endpoints", "authenticated", "x-trust-boundary", "trustZone", "data", "licenses", "services", "releaseNotes", "tags", "properties", "externalReferences"],
+    example: "Stripe Payment API v2023-10-16; AWS S3 storage service; internal Auth microservice"
+  },
   assumptions: {
     title: "Assumptions",
     line: "System Model",
     color: "#2980b9",
     desc: "Security assumptions underpinning the blueprint — conditions believed true that, if violated, invalidate the threat model.",
-    props: ["name", "description", "condition", "impact", "owner", "validationStatus"],
+    props: ["bom-ref", "description", "topic", "relatedAssets", "validity", "impact", "owner", "validationMethod", "validationDate"],
     example: "All API traffic is encrypted via TLS 1.3; the CDN provider does not cache authenticated responses"
   },
   assets: {
     title: "Assets",
     line: "System Model",
     color: "#2980b9",
-    desc: "Blueprint asset inventory — components, services, and data stores that comprise the system under analysis.",
-    props: ["name", "type (component/service/data)", "classification", "owner", "value"],
+    desc: "Blueprint asset inventory — components, services, and data stores that comprise the system under analysis, with zone placement, interfaces, and authorization.",
+    props: ["bom-ref", "componentRef", "partyRef", "type", "name", "description", "zone", "classification", "tags", "responsibilities", "interfaces", "useCases", "authentication", "authorization", "ownership", "properties", "externalReferences"],
     example: "PostgreSQL user database containing PII for 2M customers; Payment Service (Node.js microservice)"
   },
   dataStores: {
     title: "Data Stores",
     line: "System Model",
     color: "#2980b9",
-    desc: "Storage systems within the blueprint — databases, file systems, caches — with classification, placements, owners, and authorization policies.",
-    props: ["name", "type", "classification", "placements", "owners", "authorization"],
+    desc: "Storage systems within the blueprint — databases, file systems, caches — with technology details, zone placement, and linked data sets.",
+    props: ["bom-ref", "name", "description", "type", "vendor", "product", "version", "environment", "zone", "location", "technologies", "dataSets", "authorization", "properties"],
     example: "Amazon RDS (PostgreSQL) — stores customer profiles, orders, and payment tokens; Redis cache for sessions"
   },
   dataSets: {
     title: "Data Sets",
     line: "System Model",
     color: "#2980b9",
-    desc: "Data classification objects distinct from storage — representing data-level sensitivity, ownership, and authorization requirements.",
-    props: ["name", "classification", "owners", "authorization", "retentionPolicy", "sensitivity"],
+    desc: "Named data collections distinct from storage — with data profiles, data objects, record counts, ownership, and placement in data stores.",
+    props: ["bom-ref", "name", "description", "dataProfiles", "dataObjects", "recordCount", "owners", "authorization", "placements", "properties"],
     example: "Customer PII dataset — names, emails, addresses, phone numbers (classified: Confidential, retention: 7 years)"
   },
   relationships: {
     title: "Relationships",
     line: "System Model",
     color: "#2980b9",
-    desc: "Structural relationships between blueprint assets — aggregation, dependency, realization, and service relationships.",
-    props: ["type (aggregates/dependsOn/realizes/serves)", "source", "target", "description"],
+    desc: "Structural relationships between blueprint assets — each entry holds a ref to a source and arrays of targets under relationship-type properties.",
+    props: ["ref (source)", "aggregates", "associates", "composes", "contains", "dependsOn", "generalizes", "realizes", "serves", "custom"],
     example: "Payment Service dependsOn Auth Service for JWT token validation; Order Service serves Web Frontend"
   },
   zones: {
     title: "Zones",
     line: "System Model",
     color: "#2980b9",
-    desc: "Trust and network zones that partition the system architecture into distinct security domains.",
-    props: ["name", "trustLevel", "networkSegment", "assets", "classification"],
+    desc: "Trust and network zones that partition the system architecture into distinct security domains, with type, parent hierarchy, and constraints.",
+    props: ["bom-ref", "name", "description", "type", "parent", "characteristics", "constraints", "properties"],
     example: "DMZ — public-facing web servers and load balancers (trust level: Low); Internal — microservices and databases (trust level: High)"
   },
   boundaries: {
     title: "Boundaries",
     line: "System Model",
     color: "#2980b9",
-    desc: "Zone boundaries where data or control crosses between trust levels, requiring security enforcement.",
-    props: ["name", "fromZone", "toZone", "crossingRequirements", "controls"],
+    desc: "Zone boundaries where data or control crosses between trust levels — defines the zones involved, crossing requirements, and session management.",
+    props: ["bom-ref", "name", "type", "zones", "crossingRequirements", "sessionManagement", "properties"],
     example: "DMZ → Internal: requires mTLS, WAF inspection, input validation, and rate limiting"
   },
   flows: {
     title: "Flows",
     line: "System Model",
     color: "#2980b9",
-    desc: "Data and control flows between assets, describing communication paths and data movement across the system.",
-    props: ["name", "source", "destination", "protocol", "dataClassification", "crossesBoundaries"],
+    desc: "Data and control flows between assets — typed, directional communication paths with protocol, encryption, and data profile details.",
+    props: ["bom-ref", "name", "description", "type", "source", "destination", "bidirectional", "synchronous", "encrypted", "volume", "timing", "protocols", "dataProfiles", "dataObjects", "authentication", "authorization", "sequence", "properties"],
     example: "HTTPS POST /api/checkout → Payment Service → Stripe API (carries PCI card data, crosses DMZ→Internal boundary)"
   },
   useCases: {
     title: "Use Cases",
     line: "System Model",
     color: "#2980b9",
-    desc: "System use cases describing intended functionality — the legitimate counterpart to abuse cases.",
-    props: ["name", "actor", "preconditions", "mainFlow", "postconditions", "requirements"],
+    desc: "System use cases describing intended functionality — the legitimate counterpart to abuse cases. The blueprint's useCases array holds ref wrappers (ref, assets, flows, requirements); the properties below are on the use case definition object (cyclonedx-usecase-2.0).",
+    props: ["bom-ref", "name", "description", "actors", "preconditions", "postconditions", "mainFlow", "alternativeFlows", "exceptions", "successCriteria", "requirements", "businessObjectives", "notes", "properties"],
     example: "Customer places order: browses catalog, adds items to cart, enters payment details, receives order confirmation"
   },
   behaviors: {
     title: "Behaviors",
     line: "System Model",
     color: "#2980b9",
-    desc: "Behavioral models describing system reactions — triggers, state graphs, and response sequences.",
-    props: ["name", "triggers", "stateGraph", "guards", "actions"],
-    example: "On payment failure: retry 3x with exponential backoff, then notify user, log event, and alert ops"
+    desc: "Cross-cutting behavioral models defined at the blueprint level but referencing any BOM object — components, services, data flows, actors. Contains behavior instances (discrete actions) and behavior graphs (activity flows or state machines). Also referenced from threat.behaviors to describe the intent of a threat.",
+    props: ["instances", "graphs"],
+    example: "A component's behaviors: login-attempt instance (event-driven trigger, actors: [user], targets: [auth-service]) plus an order-lifecycle graph (state-machine with nodes and transitions)"
+  },
+  behaviorInstances: {
+    title: "Behavior Instances",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "A discrete behavior performed by one or more objects. Actors and targets are bom-ref/bom-link pointers to any BOM object — a component, service, data flow, actor, or data store — making behaviors cross-cutting across the entire system model.",
+    props: ["bom-ref", "behavior", "acknowledgment (array: declared | observed)", "trigger (startup | shutdown | scheduled | event-driven | user-initiated | api-call | signal | condition-based | continuous | on-demand | unknown)", "actors (bom-refs)", "targets (bom-refs)"],
+    example: "behavior: file-write, trigger: api-call, acknowledgment: observed, actors: [upload-service], targets: [blob-store]"
+  },
+  behaviorGraphs: {
+    title: "Behavior Graphs",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "A graph of nodes and transitions modeling behaviour over time — activity flows, state machines, or a mixture. The subject field is a bom-ref/bom-link to the specific object whose behavior is being modeled (a component, service, data flow, or any BOM object).",
+    props: ["bom-ref", "name", "description", "kind (activity | state-machine | mixed)", "subject (bom-ref)", "acknowledgment (array: declared | observed)", "ordering (sequential | unordered | parallel)", "trigger", "nodes", "transitions"],
+    example: "order-lifecycle: kind: state-machine, nodes: [pending, confirmed, shipped, delivered, cancelled], transitions: [pending→confirmed, confirmed→shipped, ...]"
   },
   blueprintActors: {
     title: "Blueprint Actors",
     line: "System Model",
     color: "#2980b9",
-    desc: "System-level actor definitions within the blueprint — users, services, and external systems that interact with the architecture, independent of threat scenarios.",
-    props: ["name", "type (human/system/external)", "zone", "permissions", "interfaces"],
+    desc: "System-level actor definitions within the blueprint — each references a party (person, system, or organization) and specifies their zone, permissions, and role in the architecture.",
+    props: ["bom-ref", "party (ref or inline)", "description", "permissions", "zone", "properties"],
     example: "Authenticated Customer — web/mobile access, limited to own account data; Admin — internal zone, full CRUD"
   },
 
@@ -1433,8 +1578,8 @@ const stationData = {
     title: "Attack Trees",
     line: "Attack Modeling",
     color: "#d4721a",
-    desc: "AND/OR decomposition of attack goals into sub-goals, representing structured threat analysis.",
-    props: ["goal", "operator (AND/OR)", "children", "likelihood", "cost", "difficulty"],
+    desc: "AND/OR decomposition of attack goals into sub-goals. The tree has a root and nodes; each node has an operator, children, cost, skill, and detectability.",
+    props: ["bom-ref", "name", "description", "root", "nodes (each: operator, children, attackPattern, weakness, cost, skill, detectability, mitigations)"],
     example: "Goal: Exfiltrate customer PII — OR(SQL injection in search, API parameter tampering, compromised admin credentials)"
   },
   abuseCases: {
@@ -1442,23 +1587,23 @@ const stationData = {
     line: "Attack Modeling",
     color: "#d4721a",
     desc: "Adversarial counterpart to use cases — describes how an attacker misuses system functionality.",
-    props: ["name", "abuser", "targets", "mainFlow", "preconditions", "consequences"],
+    props: ["bom-ref", "name", "description", "abuser", "realizes", "preconditions", "mainFlow", "targets", "detectionOpportunities", "mitigations"],
     example: "Attacker abuses product search by injecting UNION SELECT to dump user table via error messages"
   },
   attackPaths: {
     title: "Attack Paths",
     line: "Attack Modeling",
     color: "#d4721a",
-    desc: "Chained multi-step attack sequences from source to destination, including boundary crossings.",
-    props: ["name", "source", "destination", "steps", "boundaryCrossings", "prerequisites"],
+    desc: "Chained multi-step attack sequences with an objective and actor. Each step carries technique, attack pattern, kill chain phase, source, destination, and boundary crossings.",
+    props: ["bom-ref", "name", "description", "objective", "actor", "steps (each: technique { id, name, tactic, procedure }, attackPattern, killChainPhase, source, destination, boundaryCrossed, exploits, mitigations)", "realizes", "relatedRisks", "externalReferences", "properties"],
     example: "SQLi in search → extract DB credentials → direct DB connection → bulk PII exfiltration (crosses DMZ→Internal)"
   },
   trustBoundaries: {
     title: "Trust Boundaries",
     line: "Attack Modeling",
     color: "#d4721a",
-    desc: "Annotated trust boundary definitions with trust levels, associated threats, and protective controls.",
-    props: ["name", "trustLevel", "threats", "controls", "assets", "crossingPolicy"],
+    desc: "Annotated trust boundary definitions referencing a blueprint boundary, with trust levels and associated threats and controls.",
+    props: ["bom-ref", "boundary (ref)", "name", "description", "trustLevel", "threatsAtBoundary", "controlsAtBoundary", "properties"],
     example: "Internet → DMZ boundary: WAF required, input validation enforced, DDoS protection active"
   },
 
@@ -1467,38 +1612,38 @@ const stationData = {
     title: "Methodologies",
     line: "Scenario Assessment",
     color: "#b7472a",
-    desc: "Threat modeling methodologies applied to the scenario — STRIDE, LINDDUN, MAESTRO, PASTA, VAST, or custom frameworks.",
-    props: ["name", "type (STRIDE/LINDDUN/MAESTRO/PASTA/VAST/custom)", "scope", "coverage"],
-    example: "STRIDE applied to checkout data flow; MITRE ATT&CK mapped for detection coverage analysis"
+    desc: "Threat modeling methodology applied to the analysis — a oneOf: either a predefined enum (STRIDE, LINDDUN, PASTA, MAESTRO, OWASP, TRIKE, VAST, ATFAA, attack-tree) or a custom object with name and description.",
+    props: ["(enum: STRIDE | LINDDUN | PASTA | MAESTRO | OWASP | TRIKE | VAST | ATFAA | attack-tree)", "(or custom: { name, description })"],
+    example: "STRIDE applied to checkout data flow; PASTA for risk-centric analysis of payment processing"
   },
   actor: {
     title: "Actor",
-    line: "Attack Modeling",
-    color: "#d4721a",
-    desc: "The party (human or system) acting in a threat scenario — references a party defined in definitions.parties (distinct from blueprint actors).",
-    props: ["party (ref)", "description", "permissions", "zone"],
+    line: "Scenarios",
+    color: "#b7472a",
+    desc: "The party acting in a threat scenario — references a blueprint actor, which in turn references a party (person, system, or organization).",
+    props: ["bom-ref", "party (ref)", "description", "permissions", "zone"],
     example: "External attacker — unauthenticated, operating from the Internet zone, no existing permissions"
   },
   threatProfile: {
     title: "Threat Profile",
-    line: "Attack Modeling",
-    color: "#d4721a",
-    desc: "Reusable profile describing the durable characteristics of an actor that may pose a threat — sophistication, resources, and skill set.",
-    props: ["name", "description", "sophistication", "resources", "skillSet"],
+    line: "Scenarios",
+    color: "#b7472a",
+    desc: "Reusable profile describing the durable characteristics of an actor that may pose a threat — sophistication, resources, and skill set. Defined under profiles.threatProfiles and referenced by bom-ref from threatScenario.threatProfile.",
+    props: ["bom-ref", "name", "description", "sophistication", "resources", "skillSet", "properties"],
     example: "APT-level profile: Sophistication: Advanced; Resources: Government-backed; Skill set: zero-day exploit development, custom C2 frameworks"
   },
   attackVector: {
     title: "Attack Vector",
-    line: "Attack Modeling",
-    color: "#d4721a",
+    line: "Scenarios",
+    color: "#b7472a",
     desc: "How the attack is delivered — network context, complexity, required privileges, and scope change.",
     props: ["type (network/adjacent/local/physical)", "complexity", "privileges", "userInteraction", "scope"],
     example: "Network-based, Low complexity, No privileges required, No user interaction needed"
   },
   exploitability: {
     title: "Exploitability",
-    line: "Attack Modeling",
-    color: "#d4721a",
+    line: "Scenarios",
+    color: "#b7472a",
     desc: "Maturity and feasibility of exploiting the threat — from theoretical to weaponized.",
     props: ["level", "complexity", "skillRequired", "automatable"],
     example: "Weaponized — public exploit available (sqlmap), fully automatable, low skill required"
@@ -1508,7 +1653,7 @@ const stationData = {
     line: "Hub — Attack Modeling / Scenario Assessment",
     color: "#222",
     desc: "A specific realization of a threat, in which an actor seeks to cause harm. References the threat it realizes and carries the scenario-specific assessment (likelihood, impact, risk score). Hub linking attack modeling (orange) to scenario assessment (red).",
-    props: ["name", "threats", "actor", "threatProfile", "attackVector", "exploitability", "likelihood", "impact", "riskScore", "affectedAssets"],
+    props: ["bom-ref", "name", "description", "threats", "actor", "threatProfile", "motivation", "intent", "accessLevel", "attackVector", "exploitability", "likelihood", "impact", "riskScore", "riskAttributes", "affectedAssets", "relatedRisks", "relatedVulnerabilities", "externalReferences", "properties"],
     example: "External attacker exploits SQL injection in product search to extract 2M customer PII records via blind injection"
   },
   likelihood: {
@@ -1516,24 +1661,32 @@ const stationData = {
     line: "Scenario Assessment",
     color: "#b7472a",
     desc: "Probability assessment of the scenario occurring — qualitative level, numeric score, or statistical probability.",
-    props: ["level (very-low → certain)", "score", "probability", "frequency", "factors"],
+    props: ["level", "score", "probability", "frequency", "timeframe", "range", "factors", "rationale"],
     example: "High (score: 8/10) — public exploit exists, internet-facing endpoint, high-value target for attackers"
   },
   impact: {
     title: "Impact",
     line: "Scenario Assessment",
     color: "#b7472a",
-    desc: "Severity of consequences if the scenario materializes — across confidentiality, integrity, availability, and more.",
-    props: ["level (negligible → catastrophic)", "categories", "score", "factors", "quantification"],
+    desc: "Severity of consequences if the scenario materializes. Categories cover the CIA triad and beyond (financial, operational, reputational, regulatory, safety, privacy). Quantification captures financial loss, affected users, downtime, and other measurable metrics.",
+    props: ["level", "polarity", "score", "categories (each: category, level, score, justification)", "factors", "range", "quantification (financialLoss, affectedUsers, downtime, dataRecords, ...)", "description"],
     example: "Critical — 2M customer records exposed, estimated $4.5M regulatory fines, severe reputational damage"
   },
 
   // ── Gray — Risk Management ────────────────────────
+  riskAttributes: {
+    title: "Risk Attributes",
+    line: "Scenario Assessment",
+    color: "#b7472a",
+    desc: "Security and privacy attributes that this threat scenario would compromise if realized. Each attribute is an enum (e.g. confidentiality, integrity, availability, privacy, authentication, authorization, non-repudiation, compliance, etc.) or a custom object.",
+    props: ["(enum: accountability | authentication | authorization | authenticity | availability | compliance | confidentiality | connectivity | control | data-subject-rights | integrity | minimization | non-repudiation | possession | privacy | purpose-limitation | transparency | utility)", "(or custom: { name, description })"],
+    example: "confidentiality, integrity — a SQL injection compromises data confidentiality and integrity"
+  },
   affectedAssets: {
     title: "Affected Assets",
     line: "Scenario Assessment",
     color: "#b7472a",
-    desc: "References to the assets affected in this threat scenario. A property of threat and threatScenario — not a risk property.",
+    desc: "References to the assets affected. A property of both threat and threatScenario (shown here on Threat Scenario; a dashed cross-reference connects from Threat as well).",
     props: ["bom-ref links to components", "bom-ref links to services", "bom-ref links to data stores"],
     example: "User database (PostgreSQL), Search Service API, Customer PII dataset"
   },
@@ -1541,8 +1694,8 @@ const stationData = {
     title: "Risk",
     line: "Hub — Risk / Controls",
     color: "#222",
-    desc: "The formal risk object connecting risk ratings to responses and controls. Has bom-ref cross-references back to threats (relatedThreats), vulnerabilities (relatedVulnerabilities), weaknesses (relatedWeaknesses), requirements (relatedRequirements), and affected subjects (affects).",
-    props: ["name", "statement", "affects", "relatedThreats", "relatedVulnerabilities", "relatedWeaknesses", "relatedRequirements", "inherentRisk", "residualRisk", "targetRisk", "responses", "status", "owner"],
+    desc: "The formal risk object connecting risk ratings to responses and controls. Domains classify the risk (e.g. operational, financial, regulatory, reputational, safety, privacy). Has bom-ref cross-references back to threats, vulnerabilities, weaknesses, requirements, standards, claims, business objectives, and affected subjects.",
+    props: ["bom-ref", "name", "statement", "description", "domains", "affects", "relatedThreats", "relatedVulnerabilities", "relatedWeaknesses", "relatedRequirements", "relatedStandards", "relatedClaims", "relatedBusinessObjectives", "inherentRisk", "residualRisk", "targetRisk", "responses", "status", "owner", "properties"],
     example: "RISK-007: Customer data breach via SQL injection — Inherent: Critical, Residual: Medium, Target: Low"
   },
   riskScore: {
@@ -1557,32 +1710,32 @@ const stationData = {
     title: "Inherent Risk",
     line: "Risk Management",
     color: "#6b6b6b",
-    desc: "Pre-control risk rating — the risk level before any mitigating controls are applied. Uses the 'rating' object type (likelihood, impact, factors), distinct from threatScenario.riskScore.",
-    props: ["likelihood", "impact", "score", "level", "vector", "methodology", "justification"],
+    desc: "Pre-control risk rating — the risk level before any mitigating controls are applied. Uses the 'rating' object type, distinct from threatScenario.riskScore.",
+    props: ["likelihood", "impact", "score", "detectability", "confidence", "rationale"],
     example: "Critical (9.2) — before parameterized queries, WAF, or input validation are deployed"
   },
   residualRisk: {
     title: "Residual Risk",
     line: "Risk Management",
     color: "#6b6b6b",
-    desc: "Post-control risk rating — the risk level remaining after mitigating controls are applied.",
-    props: ["level", "score", "vector", "methodology", "justification"],
+    desc: "Post-control risk rating — the risk level remaining after mitigating controls are applied. Same 'rating' object type as inherent and target risk.",
+    props: ["likelihood", "impact", "score", "detectability", "confidence", "rationale"],
     example: "Medium (4.1) — after WAF rules and parameterized queries applied; stored procedures still uncovered"
   },
   targetRisk: {
     title: "Target Risk",
     line: "Risk Management",
     color: "#6b6b6b",
-    desc: "The desired risk level after planned controls are fully implemented — the third tier of the risk rating model alongside inherent and residual risk.",
-    props: ["level", "score", "vector", "methodology", "justification", "targetDate"],
+    desc: "The desired risk level after planned controls are fully implemented — the third tier of the risk rating model alongside inherent and residual risk. Same 'rating' object type.",
+    props: ["likelihood", "impact", "score", "detectability", "confidence", "rationale"],
     example: "Low (2.0) — target after adding runtime SQL monitoring, input fuzzing, and stored procedure migration"
   },
   riskResponse: {
     title: "Risk Response",
     line: "Risk Management",
     color: "#6b6b6b",
-    desc: "Strategy for addressing identified risk — avoid, reduce, transfer, or accept — with linked controls.",
-    props: ["strategy (avoid/reduce/transfer/accept)", "controls", "owner", "deadline", "status"],
+    desc: "Strategy for addressing identified risk — avoid, reduce, transfer, accept, exploit, or enhance — with linked controls. Exploit and enhance cover positive risk (opportunity).",
+    props: ["bom-ref", "strategy (avoid | reduce | transfer | accept | exploit | enhance)", "description", "controls", "status", "effectiveness", "cost", "priority", "owner", "targetDate", "addresses", "externalReferences", "properties"],
     example: "Reduce — deploy parameterized queries (Sprint 12), WAF rules (Sprint 13), runtime SQL monitoring (Sprint 15)"
   },
   assessment: {
@@ -1590,7 +1743,7 @@ const stationData = {
     line: "Risk Management",
     color: "#6b6b6b",
     desc: "Point-in-time risk assessment event. A peer of risks inside the top-level 'risks' container — not a property of individual risk objects. References risks via bom-ref and computes an overallRisk score.",
-    props: ["name", "type", "cadence", "scope", "status", "assessors", "risks (refs)", "overallRisk", "riskAppetites", "recommendations"],
+    props: ["bom-ref", "name", "type", "cadence", "timestamp", "scope", "status", "assessors", "summary", "risks", "overallRisk", "assumptions", "recommendations", "nextReview", "riskAppetites", "externalReferences", "properties"],
     example: "Q3 2026 Application Security Review — scope: all public-facing APIs; finding: 3 SQLi vectors in search service"
   },
 
@@ -1598,8 +1751,8 @@ const stationData = {
     title: "Risk Appetite",
     line: "Risk Management",
     color: "#6b6b6b",
-    desc: "The acceptable level of risk an organization is willing to bear. Defined in the top-level 'risks' container and within individual assessments.",
-    props: ["name", "description", "level", "domain", "owner", "conditions"],
+    desc: "The acceptable level of risk an organization is willing to bear — defined in the top-level 'risks' container and within individual assessments.",
+    props: ["bom-ref", "party", "level (averse | minimal | cautious | open | hungry)", "statement", "rationale", "owner", "horizon", "nextReview", "categories"],
     example: "Data breach risk appetite: Low — zero tolerance for customer PII exposure; Availability risk: Medium — up to 4h downtime acceptable"
   },
 
@@ -1609,16 +1762,16 @@ const stationData = {
     line: "Hub — Controls / Requirements",
     color: "#222",
     desc: "A security control that mitigates threats. Hub connecting controls & mitigation (green) to requirements & governance (teal).",
-    props: ["name", "type (preventive/detective/corrective)", "implementation", "appliesTo", "effectiveness"],
+    props: ["bom-ref", "name", "description", "category", "status", "appliesTo", "implementedBy", "satisfies", "effectiveness", "owner", "externalReferences", "properties"],
     example: "CTL-019: Parameterized database queries — preventive control applied to all services querying PostgreSQL"
   },
   effectiveness: {
     title: "Effectiveness",
     line: "Controls & Mitigation",
     color: "#27ae60",
-    desc: "Measured effectiveness of a security control — how well it reduces risk in practice.",
-    props: ["rating (high/medium/low)", "evidence", "lastAssessed", "coverageGaps"],
-    example: "High (92%) — blocks all known SQLi patterns in DAST scan; gap: legacy stored procedures not yet covered"
+    desc: "Measured effectiveness of a security control — a decimal percentage (0 to 1) and qualitative rating.",
+    props: ["percentage (decimal 0–1)", "rating (ineffective | marginal | adequate | good | excellent)"],
+    example: "Good (0.92) — blocks all known SQLi patterns in DAST scan; gap: legacy stored procedures not yet covered"
   },
   appliesTo: {
     title: "Applies To",
@@ -1642,8 +1795,8 @@ const stationData = {
     title: "Satisfies",
     line: "Requirements & Governance",
     color: "#16a085",
-    desc: "The control-to-requirement link — traces which requirements a control satisfies, enabling compliance and coverage tracking.",
-    props: ["control", "requirementRefs", "coverageLevel", "evidence"],
+    desc: "The control-to-requirement link — an array of bom-ref pointers from a control to the requirement objects it satisfies, enabling compliance and coverage tracking.",
+    props: ["(bom-ref array — references to requirement objects)"],
     example: "CTL-019 (parameterized queries) satisfies REQ-SEC-04 (injection prevention) — coverage: full, evidence: SAST + DAST reports"
   },
   requirements: {
@@ -1651,15 +1804,15 @@ const stationData = {
     line: "Requirements & Governance",
     color: "#16a085",
     desc: "Formal requirement objects from cyclonedx-requirement-2.0 — security, functional, and compliance requirements with acceptance criteria, dependencies, and risk links. Distinct from blueprint.requirements, which references these objects via bom-ref.",
-    props: ["name", "type (security/functional/compliance)", "priority", "status", "acceptanceCriteria", "dependencies", "risk", "stakeholders"],
+    props: ["bom-ref", "id", "name", "description", "type (functional | security | compliance | regulatory | performance | ...)", "priority", "status (draft | proposed | approved | implemented | verified | deferred | rejected | replaced | obsolete)", "version", "stakeholders", "acceptanceCriteria", "dependencies", "parent", "rationale", "fitCriterion", "effort", "risk", "attachments", "properties", "externalReferences"],
     example: "REQ-SEC-04: All database queries must use parameterized statements — Priority: Critical, Source: OWASP ASVS 5.3.4, Status: Approved"
   },
   acceptanceCriteria: {
     title: "Acceptance Criteria",
     line: "Requirements & Governance",
     color: "#16a085",
-    desc: "Verifiable conditions that prove a requirement has been met — the testable definition of done.",
-    props: ["requirement", "condition", "testMethod", "evidence", "status (pass/fail/pending)"],
+    desc: "Verifiable conditions that prove a requirement has been met — the testable definition of done. A child array inside a requirement object.",
+    props: ["id", "description", "status"],
     example: "PASS: Static analysis confirms 0 raw SQL strings in codebase; DAST scan finds 0 SQLi vectors across 47 endpoints"
   }
 };
@@ -1825,7 +1978,7 @@ const routePhases = [
     desc: "Blueprint defines the system architecture — assets, zones, flows, and actors",
     color: "#2980b9",
     waypoints: [[200,360]],
-    branchStations: ["assumptions","assets","dataStores","dataSets","relationships","zones","boundaries","flows","useCases","behaviors","blueprintActors"]
+    branchStations: ["scope","components","services","assumptions","assets","dataStores","dataSets","relationships","zones","boundaries","flows","useCases","behaviors","behaviorInstances","behaviorGraphs","blueprintActors"]
   },
   {
     phaseNumber: 3,
@@ -1833,7 +1986,7 @@ const routePhases = [
     desc: "Threat intelligence — weaknesses, vulnerabilities, attack patterns, kill chain",
     color: "#3b2d8e",
     waypoints: [[200,360],[350,360],[620,360]],
-    branchStations: ["weakness","vulnerabilities","capec","killChain","indicators"]
+    branchStations: ["weakness","vulnerabilities","attackPattern","killChain","indicators"]
   },
   {
     phaseNumber: 4,
@@ -1848,7 +2001,7 @@ const routePhases = [
     title: "Model the Attacks",
     desc: "Structured attack analysis — trees, abuse cases, paths, trust boundaries",
     color: "#d4721a",
-    waypoints: [[620,360]],
+    waypoints: [[350,360],[620,360]],
     branchStations: ["attackTrees","abuseCases","attackPaths","trustBoundaries"]
   },
   {
@@ -1857,7 +2010,7 @@ const routePhases = [
     desc: "Concrete threat scenarios — actors, vectors, exploitability, likelihood, impact",
     color: "#b7472a",
     waypoints: [[620,360],[580,420],[540,490],[540,590]],
-    branchStations: ["actor","threatProfile","attackVector","exploitability","methodologies","likelihood","impact","riskScore"]
+    branchStations: ["actor","threatProfile","attackVector","exploitability","methodologies","likelihood","impact","riskScore","riskAttributes"]
   },
   {
     phaseNumber: 7,
@@ -2307,7 +2460,7 @@ buildRegistry();
 // ─── Line Filter (click legend to isolate a line) ────
 const lineFilterMap = {
   purple: {
-    stations: ['threatModel', 'weakness', 'vulnerabilities', 'capec', 'killChain', 'indicators'],
+    stations: ['threatModel', 'weakness', 'vulnerabilities', 'attackPattern', 'killChain', 'indicators'],
     hubs: ['blueprint', 'threat']
   },
   sienna: {
@@ -2315,16 +2468,16 @@ const lineFilterMap = {
     hubs: ['threat']
   },
   cyan: {
-    stations: ['assumptions', 'assets', 'dataStores', 'dataSets', 'relationships', 'zones', 'boundaries', 'flows', 'useCases', 'behaviors', 'blueprintActors'],
+    stations: ['scope', 'components', 'services', 'assumptions', 'assets', 'dataStores', 'dataSets', 'relationships', 'zones', 'boundaries', 'flows', 'useCases', 'behaviors', 'behaviorInstances', 'behaviorGraphs', 'blueprintActors'],
     hubs: ['blueprint']
   },
   orange: {
-    stations: ['actor', 'threatProfile', 'attackVector', 'exploitability', 'attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries'],
-    hubs: ['threat', 'threatScenario']
+    stations: ['attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries'],
+    hubs: ['threatModel', 'threat']
   },
   red: {
-    stations: ['methodologies', 'likelihood', 'impact', 'riskScore', 'affectedAssets'],
-    hubs: ['threatScenario']
+    stations: ['actor', 'threatProfile', 'attackVector', 'exploitability', 'methodologies', 'likelihood', 'impact', 'riskScore', 'affectedAssets', 'riskAttributes'],
+    hubs: ['threat', 'threatScenario']
   },
   gray: {
     stations: ['inherentRisk', 'residualRisk', 'targetRisk', 'riskResponse', 'assessment', 'riskAppetite'],
@@ -2380,7 +2533,13 @@ function applyLineFilter(lineKey) {
   const activeHexColor = lineColorHexMap[activeLineFilter];
 
   mapGroup.querySelectorAll('polyline:not(#route-trail)').forEach(el => {
-    el.style.opacity = el.classList.contains(activeCssClass) ? '' : dimOpacity;
+    if (el.classList.contains(activeCssClass)) {
+      el.style.opacity = '';
+    } else if (el.dataset.lines && el.dataset.lines.split(',').includes(activeLineFilter)) {
+      el.style.opacity = '';
+    } else {
+      el.style.opacity = dimOpacity;
+    }
   });
 
   mapGroup.querySelectorAll('rect').forEach(el => {
