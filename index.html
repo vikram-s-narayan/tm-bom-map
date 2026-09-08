@@ -119,6 +119,7 @@
   .line-cyan   { stroke: #2980b9; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .line-sienna { stroke: #A0522D; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .line-gold   { stroke: #9B7B2C; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .line-magenta { stroke: #c2185b; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
   /* Station styles */
   .station-dot {
@@ -147,6 +148,7 @@
   .label-cyan   { fill: #1f6691; }
   .label-sienna { fill: #A0522D; }
   .label-gold  { fill: #7a6123; }
+  .label-magenta { fill: #a11449; }
 
   .hub-circle {
     cursor: pointer;
@@ -330,25 +332,37 @@
 
 <div id="header">
   <div style="flex-shrink:0;">
-    <h1>Threat Modeling BOM — Metro Map</h1>
+    <h1>Threat Modeling BOM Map</h1>
     <div class="subtitle">CycloneDX 2.0</div>
   </div>
   <div class="legend">
     <div class="legend-item active" data-line="all">
-      <div class="legend-swatch" style="background:linear-gradient(90deg,#9B7B2C,#3b2d8e,#A0522D,#d4721a,#b7472a,#6b6b6b,#27ae60,#16a085,#2980b9);"></div>
+      <div class="legend-swatch" style="background:linear-gradient(90deg,#9B7B2C,#3b2d8e,#A0522D,#d4721a,#b7472a,#6b6b6b,#27ae60,#16a085,#2980b9,#c2185b);"></div>
       All
     </div>
     <div class="legend-item" data-line="gold">
       <div class="legend-swatch" style="background:#9B7B2C;"></div>
       Objectives
     </div>
+    <div class="legend-item" data-line="cyan">
+      <div class="legend-swatch" style="background:#2980b9;"></div>
+      System
+    </div>
+    <div class="legend-item" data-line="magenta">
+      <div class="legend-swatch" style="background:#c2185b;"></div>
+      AI/ML
+    </div>
     <div class="legend-item" data-line="purple">
       <div class="legend-swatch" style="background:#3b2d8e;"></div>
       Intelligence
     </div>
+    <div class="legend-item" data-line="sienna">
+      <div class="legend-swatch" style="background:#A0522D;"></div>
+      Origin
+    </div>
     <div class="legend-item" data-line="orange">
       <div class="legend-swatch" style="background:#d4721a;"></div>
-      Attack
+      Threats
     </div>
     <div class="legend-item" data-line="red">
       <div class="legend-swatch" style="background:#b7472a;"></div>
@@ -365,14 +379,6 @@
     <div class="legend-item" data-line="teal">
       <div class="legend-swatch" style="background:#16a085;"></div>
       Requirements
-    </div>
-    <div class="legend-item" data-line="sienna">
-      <div class="legend-swatch" style="background:#A0522D;"></div>
-      Origin
-    </div>
-    <div class="legend-item" data-line="cyan">
-      <div class="legend-swatch" style="background:#2980b9;"></div>
-      System
     </div>
   </div>
 </div>
@@ -401,6 +407,9 @@
       </marker>
       <marker id="cap-cyan" markerWidth="8" markerHeight="8" refX="4" refY="4">
         <rect x="1" y="0" width="6" height="8" rx="1" fill="#2980b9"/>
+      </marker>
+      <marker id="cap-magenta" markerWidth="8" markerHeight="8" refX="4" refY="4">
+        <rect x="1" y="0" width="6" height="8" rx="1" fill="#c2185b"/>
       </marker>
       <!-- Train glow filter -->
       <filter id="train-glow" x="-50%" y="-50%" width="200%" height="200%">
@@ -470,7 +479,7 @@
       <!-- ============================================ -->
 
       <!-- Business Objectives terminus spur -->
-      <polyline points="80,120 80,160"
+      <polyline points="80,840 80,880"
                 class="line-gold" stroke-width="7"/>
 
       <!-- ============================================ -->
@@ -540,6 +549,38 @@
       <!-- Blueprint → Relationships (branch down-right) -->
       <polyline points="200,360 230,395 260,430"
                 class="line-cyan" stroke-width="7"/>
+
+      <!-- ============================================ -->
+      <!-- MAGENTA LINES — AI / ML Model Card           -->
+      <!-- ============================================ -->
+
+      <!-- Components → Model Card -->
+      <polyline points="280,310 170,220"
+                class="line-magenta" stroke-width="7"/>
+
+      <!-- Model Card → Model Parameters (upper-left) -->
+      <polyline points="170,220 130,130"
+                class="line-magenta" stroke-width="7"/>
+
+      <!-- Model Card → Quantitative Analysis (upper-right) -->
+      <polyline points="170,220 220,140"
+                class="line-magenta" stroke-width="7"/>
+
+      <!-- Quantitative Analysis → Performance Metrics (up) -->
+      <polyline points="220,140 170,80"
+                class="line-magenta" stroke-width="7"/>
+
+      <!-- Model Card → Considerations (left) -->
+      <polyline points="170,220 30,220"
+                class="line-magenta" stroke-width="7"/>
+
+      <!-- Considerations → Fairness Assessments (upper-left) -->
+      <polyline points="30,220 -50,180"
+                class="line-magenta" stroke-width="7"/>
+
+      <!-- Considerations → Environmental Impact (lower-left) -->
+      <polyline points="30,220 -50,260"
+                class="line-magenta" stroke-width="7"/>
 
       <!-- Attack Trees → Abuse Cases → Threat (approach from right) -->
       <polyline points="960,380 880,380 620,360"
@@ -688,7 +729,7 @@
       <rect x="952" y="262" width="10" height="16" rx="2" fill="#3b2d8e"/>   <!-- Indicators -->
 
       <!-- Gold terminal -->
-      <rect x="75" y="112" width="10" height="16" rx="2" fill="#9B7B2C"/>   <!-- Business Objectives -->
+      <rect x="75" y="832" width="10" height="16" rx="2" fill="#9B7B2C"/>   <!-- Business Objectives -->
 
       <!-- Cyan terminals -->
       <rect x="185" y="292" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Scope -->
@@ -737,6 +778,12 @@
       <!-- Teal terminals -->
       <rect x="1292" y="992" width="10" height="16" rx="2" fill="#16a085"/> <!-- Requirements -->
       <rect x="1312" y="1042" width="10" height="16" rx="2" fill="#16a085"/> <!-- Acceptance Criteria -->
+
+      <!-- Magenta terminals -->
+      <rect x="122" y="122" width="10" height="16" rx="2" fill="#c2185b"/>   <!-- Model Parameters -->
+      <rect x="162" y="72" width="10" height="16" rx="2" fill="#c2185b"/>    <!-- Performance Metrics -->
+      <rect x="-58" y="172" width="10" height="16" rx="2" fill="#c2185b"/>   <!-- Fairness Assessments -->
+      <rect x="-58" y="252" width="10" height="16" rx="2" fill="#c2185b"/>   <!-- Environmental Impact -->
 
 
       <!-- ============================================ -->
@@ -792,8 +839,8 @@
 
       <!-- Gold station (Business Objectives) -->
       <g class="station-dot" data-station="businessObjectives">
-        <circle class="hit-area" cx="80" cy="160" r="20"/>
-        <circle cx="80" cy="160" r="6" fill="#fff" stroke="#9B7B2C" stroke-width="3" pointer-events="none"/>
+        <circle class="hit-area" cx="80" cy="880" r="20"/>
+        <circle cx="80" cy="880" r="6" fill="#fff" stroke="#9B7B2C" stroke-width="3" pointer-events="none"/>
       </g>
 
       <!-- Cyan stations (System Model) -->
@@ -817,9 +864,11 @@
         <circle class="hit-area" cx="-70" cy="520" r="20"/>
         <circle cx="-70" cy="520" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
       </g>
-      <g class="station-dot" data-station="components">
-        <circle class="hit-area" cx="280" cy="310" r="20"/>
-        <circle cx="280" cy="310" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      <!-- Components Hub (Cyan + Magenta) -->
+      <g class="hub-circle" data-station="components">
+        <circle class="hit-area" cx="280" cy="310" r="24"/>
+        <circle cx="280" cy="310" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
+        <circle cx="280" cy="310" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="services">
         <circle class="hit-area" cx="360" cy="280" r="20"/>
@@ -860,6 +909,36 @@
       <g class="station-dot" data-station="behaviorGraphs">
         <circle class="hit-area" cx="-20" cy="770" r="20"/>
         <circle cx="-20" cy="770" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+
+      <!-- Magenta stations (AI / ML Model Card) -->
+      <g class="station-dot" data-station="modelCard">
+        <circle class="hit-area" cx="170" cy="220" r="20"/>
+        <circle cx="170" cy="220" r="6" fill="#fff" stroke="#c2185b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="modelParameters">
+        <circle class="hit-area" cx="130" cy="130" r="20"/>
+        <circle cx="130" cy="130" r="6" fill="#fff" stroke="#c2185b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="quantitativeAnalysis">
+        <circle class="hit-area" cx="220" cy="140" r="20"/>
+        <circle cx="220" cy="140" r="6" fill="#fff" stroke="#c2185b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="performanceMetrics">
+        <circle class="hit-area" cx="170" cy="80" r="20"/>
+        <circle cx="170" cy="80" r="6" fill="#fff" stroke="#c2185b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="considerations">
+        <circle class="hit-area" cx="30" cy="220" r="20"/>
+        <circle cx="30" cy="220" r="6" fill="#fff" stroke="#c2185b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="fairnessAssessments">
+        <circle class="hit-area" cx="-50" cy="180" r="20"/>
+        <circle cx="-50" cy="180" r="6" fill="#fff" stroke="#c2185b" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="environmentalImpact">
+        <circle class="hit-area" cx="-50" cy="260" r="20"/>
+        <circle cx="-50" cy="260" r="6" fill="#fff" stroke="#c2185b" stroke-width="3" pointer-events="none"/>
       </g>
 
       <!-- Orange stations (Attack Modeling, merged) -->
@@ -1058,7 +1137,7 @@
       <text x="245" y="235" text-anchor="end" class="station-label label-sienna">Environmental</text>
 
       <!-- Gold label (Business Objectives) -->
-      <text x="95" y="150" text-anchor="start" class="station-label label-gold">
+      <text x="95" y="870" text-anchor="start" class="station-label label-gold">
         <tspan x="95" dy="0">Business</tspan>
         <tspan x="95" dy="14">Objectives</tspan>
       </text>
@@ -1069,7 +1148,7 @@
       <text x="75" y="458" text-anchor="end" class="station-label label-cyan">Assets</text>
       <text x="-15" y="488" text-anchor="end" class="station-label label-cyan">Data Stores</text>
       <text x="-85" y="518" text-anchor="end" class="station-label label-cyan">Data Sets</text>
-      <text x="265" y="305" text-anchor="end" class="station-label label-cyan">Components</text>
+      <text x="265" y="305" text-anchor="end" class="station-label" style="font-size:14px; fill:#222;">Components</text>
       <text x="375" y="278" text-anchor="start" class="station-label label-cyan">Services</text>
       <text x="275" y="428" text-anchor="start" class="station-label label-cyan">Relationships</text>
       <text x="65" y="508" text-anchor="end" class="station-label label-cyan">Zones</text>
@@ -1088,6 +1167,33 @@
       <text x="-45" y="768" text-anchor="end" class="station-label label-cyan">
         <tspan x="-45" dy="0">Behavior</tspan>
         <tspan x="-45" dy="14">Graphs</tspan>
+      </text>
+
+      <!-- Magenta labels (AI / ML Model Card) -->
+      <text x="155" y="218" text-anchor="end" class="station-label label-magenta">
+        <tspan x="155" dy="0">Model</tspan>
+        <tspan x="155" dy="14">Card</tspan>
+      </text>
+      <text x="115" y="125" text-anchor="end" class="station-label label-magenta">
+        <tspan x="115" dy="0">Model</tspan>
+        <tspan x="115" dy="14">Parameters</tspan>
+      </text>
+      <text x="235" y="135" text-anchor="start" class="station-label label-magenta">
+        <tspan x="235" dy="0">Quantitative</tspan>
+        <tspan x="235" dy="14">Analysis</tspan>
+      </text>
+      <text x="185" y="75" text-anchor="start" class="station-label label-magenta">
+        <tspan x="185" dy="0">Performance</tspan>
+        <tspan x="185" dy="14">Metrics</tspan>
+      </text>
+      <text x="15" y="215" text-anchor="end" class="station-label label-magenta">Considerations</text>
+      <text x="-65" y="175" text-anchor="end" class="station-label label-magenta">
+        <tspan x="-65" dy="0">Fairness</tspan>
+        <tspan x="-65" dy="14">Assessments</tspan>
+      </text>
+      <text x="-65" y="255" text-anchor="end" class="station-label label-magenta">
+        <tspan x="-65" dy="0">Environmental</tspan>
+        <tspan x="-65" dy="14">Impact</tspan>
       </text>
 
       <!-- Orange labels (Attack Modeling, merged) -->
@@ -1257,21 +1363,21 @@
                 data-lines="green,cyan"/>
 
       <!-- threat.relatedBusinessObjectives — refs from threat to business objectives -->
-      <polyline points="620,360 400,280 200,200 80,160"
+      <polyline points="620,360 400,500 200,700 80,880"
                 stroke="#9B7B2C" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
                 stroke-linecap="round" stroke-linejoin="round"
                 data-lines="purple,gold"/>
 
       <!-- risk.relatedBusinessObjectives — refs from risk to business objectives -->
-      <polyline points="900,750 600,500 300,300 80,160"
+      <polyline points="900,750 600,820 300,860 80,880"
                 stroke="#9B7B2C" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
                 stroke-linecap="round" stroke-linejoin="round"
                 data-lines="gray,gold"/>
 
       <!-- useCase.businessObjectives — refs from use cases to business objectives -->
-      <polyline points="110,660 95,400 80,160"
+      <polyline points="110,660 95,770 80,880"
                 stroke="#9B7B2C" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
                 stroke-linecap="round" stroke-linejoin="round"
@@ -1303,6 +1409,7 @@
     <div class="phase-desc" id="phase-desc">Press → or click Next to advance</div>
   </div>
   <div class="phase-dots" id="phase-dots">
+    <div class="phase-dot"></div>
     <div class="phase-dot"></div>
     <div class="phase-dot"></div>
     <div class="phase-dot"></div>
@@ -1454,11 +1561,11 @@ const stationData = {
   // ── Cyan — System Model / Use Cases ───────────────
   components: {
     title: "Components",
-    line: "System Model",
-    color: "#2980b9",
-    desc: "Top-level BOM inventory of software and hardware components — libraries, frameworks, applications, containers, devices, and firmware. Referenced by blueprint assets via componentRef and by controls via implementedBy and appliesTo.",
-    props: ["type", "bom-ref", "name", "version", "description", "group", "scope", "parties", "hashes", "licenses", "identifiers", "pedigree", "components", "evidence", "releaseNotes", "tags", "properties", "externalReferences"],
-    example: "Express.js v4.18.2 (library); PostgreSQL v15 (application); nginx:1.25 (container)"
+    line: "Hub — System Model / AI Model Card",
+    color: "#222",
+    desc: "Top-level BOM inventory of software, hardware, and ML model components — libraries, frameworks, applications, containers, devices, firmware, and machine-learning-models. Hub connecting the system model (cyan) to AI/ML model cards (magenta). Components of type machine-learning-model carry a modelCard object describing training parameters, performance metrics, and ethical considerations.",
+    props: ["type (application | framework | library | container | platform | device | firmware | file | machine-learning-model | data | cryptographic-asset)", "bom-ref", "name", "version", "description", "group", "scope", "parties", "hashes", "licenses", "identifiers", "pedigree", "components", "evidence", "modelCard", "releaseNotes", "tags", "properties", "externalReferences"],
+    example: "Express.js v4.18.2 (library); PostgreSQL v15 (application); GPT-4-turbo (machine-learning-model, with modelCard)"
   },
   services: {
     title: "Services",
@@ -1522,7 +1629,7 @@ const stationData = {
     color: "#2980b9",
     desc: "Zone boundaries where data or control crosses between trust levels — defines the zones involved, crossing requirements, and session management.",
     props: ["bom-ref", "name", "type", "zones", "crossingRequirements", "sessionManagement", "properties"],
-    example: "DMZ → Internal: requires mTLS, WAF inspection, input validation, and rate limiting"
+    example: "BOUNDARY-01: type: network, zones: [DMZ, Internal], crossingRequirements: mTLS, input validation, rate limiting, session management: stateless JWT"
   },
   flows: {
     title: "Flows",
@@ -1573,6 +1680,64 @@ const stationData = {
     example: "Authenticated Customer — web/mobile access, limited to own account data; Admin — internal zone, full CRUD"
   },
 
+  // ── Magenta — AI / ML Model Card ─────────────────
+  modelCard: {
+    title: "Model Card",
+    line: "AI / ML Model Card",
+    color: "#c2185b",
+    desc: "Describes the intended uses of a machine learning model and potential limitations, including biases and ethical considerations. Derived from TensorFlow Model Card Toolkit and VerifyML. Specified on any component of type machine-learning-model.",
+    props: ["bom-ref", "modelParameters", "quantitativeAnalysis", "considerations", "properties"],
+    example: "GPT-4 model card: transformer architecture, supervised + RLHF approach, text generation task, with fairness assessments and energy consumption tracking"
+  },
+  modelParameters: {
+    title: "Model Parameters",
+    line: "AI / ML Model Card",
+    color: "#c2185b",
+    desc: "Hyper-parameters for construction of the model — the learning approach, task, architecture family, specific architecture, training/evaluation datasets (inline or by reference), and input/output formats.",
+    props: ["approach (type: supervised | unsupervised | reinforcement-learning | semi-supervised | self-supervised)", "task", "architectureFamily", "modelArchitecture", "datasets (inline componentData or ref)", "inputs (format: string | image | time-series | ...)", "outputs (format)"],
+    example: "approach: supervised, task: image classification, architectureFamily: convolutional neural network, modelArchitecture: ResNet-50, datasets: [ImageNet-1K], inputs: [image 224x224], outputs: [class probability vector]"
+  },
+  quantitativeAnalysis: {
+    title: "Quantitative Analysis",
+    line: "AI / ML Model Card",
+    color: "#c2185b",
+    desc: "Quantitative analysis of the model — performance metrics (accuracy, F1, precision, MSE, etc.) with optional data slicing and confidence intervals, plus a graphics collection for visual representations of measurements.",
+    props: ["performanceMetrics (array of performanceMetric)", "graphics (graphicsCollection: description, collection of graphic objects)"],
+    example: "Metrics: accuracy 0.94 (95% CI: 0.93-0.95), F1 0.91 on validation set; slice 'age>65' accuracy drops to 0.87; confusion matrix graphic attached"
+  },
+  performanceMetrics: {
+    title: "Performance Metrics",
+    line: "AI / ML Model Card",
+    color: "#c2185b",
+    desc: "Individual model performance metric — reports the metric type, measured value, optional data slice name, and confidence interval with lower/upper bounds. Examples include accuracy, F1 score, precision, recall, top-k error rates, MSE, AUC-ROC.",
+    props: ["type", "value", "slice", "confidenceInterval (lowerBound, upperBound)"],
+    example: "type: F1-score, value: 0.91, slice: english-language, confidenceInterval: { lowerBound: 0.89, upperBound: 0.93 }"
+  },
+  considerations: {
+    title: "Considerations",
+    line: "AI / ML Model Card",
+    color: "#c2185b",
+    desc: "Considerations regarding the model's construction, training, and application — intended users, use cases, technical limitations, performance tradeoffs, ethical risks (name + mitigation strategy), environmental impact, and fairness assessments for at-risk groups.",
+    props: ["users (string[])", "useCases (string[])", "technicalLimitations (string[])", "performanceTradeoffs (string[])", "ethicalConsiderations (risk: name, mitigationStrategy)", "environmentalConsiderations", "fairnessAssessments"],
+    example: "Users: ML engineers, content moderators; Limitation: poor performance on low-resource languages; Ethical risk: potential for generating misinformation, mitigated by output filtering"
+  },
+  fairnessAssessments: {
+    title: "Fairness Assessments",
+    line: "AI / ML Model Card",
+    color: "#c2185b",
+    desc: "Information about the benefits and harms of the model to an identified at-risk group — groups that may be systematically disadvantaged. Each assessment documents the group, expected benefits, expected harms, and a mitigation strategy.",
+    props: ["groupAtRisk", "benefits", "harms", "mitigationStrategy"],
+    example: "groupAtRisk: elderly users with non-standard speech patterns; harms: 23% higher word error rate; benefits: hands-free device interaction; mitigationStrategy: fine-tune on age-diverse speech corpus"
+  },
+  environmentalImpact: {
+    title: "Environmental Impact",
+    line: "AI / ML Model Card",
+    color: "#c2185b",
+    desc: "Environmental impact metrics for the ML model lifecycle — energy consumption per activity (design, data-collection, data-preparation, training, fine-tuning, validation, deployment, inference), energy providers with source type, total activity energy cost in kWh, CO2 equivalent cost, and CO2 offset credits.",
+    props: ["energyConsumptions (array per activity)", "activity (design | data-collection | data-preparation | training | fine-tuning | validation | deployment | inference)", "energyProviders (organization, energySource: coal | oil | natural-gas | nuclear | wind | solar | geothermal | hydropower | biofuel, energyProvided in kWh)", "activityEnergyCost (kWh)", "co2CostEquivalent (tCO2eq)", "co2CostOffset (tCO2eq)"],
+    example: "Training: 1,287 kWh from AWS US-East, co2Equivalent: 0.58 tCO2eq; Inference: 0.003 kWh per request from solar-powered data center, co2Offset: 2.1 tCO2eq annual"
+  },
+
   // ── Orange — Attack Modeling ──
   attackTrees: {
     title: "Attack Trees",
@@ -1604,7 +1769,7 @@ const stationData = {
     color: "#d4721a",
     desc: "Annotated trust boundary definitions referencing a blueprint boundary, with trust levels and associated threats and controls.",
     props: ["bom-ref", "boundary (ref)", "name", "description", "trustLevel", "threatsAtBoundary", "controlsAtBoundary", "properties"],
-    example: "Internet → DMZ boundary: WAF required, input validation enforced, DDoS protection active"
+    example: "TB-01 annotates BOUNDARY-01 (DMZ→Internal): trustLevel: semi-trusted; threatsAtBoundary: [SQL injection, credential stuffing]; controlsAtBoundary: [WAF rules, rate limiter]"
   },
 
   // ── Red — Scenario Assessment ─────────────────────
@@ -1982,6 +2147,14 @@ const routePhases = [
   },
   {
     phaseNumber: 3,
+    title: "Document AI Models",
+    desc: "Model cards for machine-learning-model components — parameters, metrics, fairness, and environmental impact",
+    color: "#c2185b",
+    waypoints: [[280,310],[170,220]],
+    branchStations: ["modelParameters","quantitativeAnalysis","performanceMetrics","considerations","fairnessAssessments","environmentalImpact"]
+  },
+  {
+    phaseNumber: 4,
     title: "Catalog the Threats",
     desc: "Threat intelligence — weaknesses, vulnerabilities, attack patterns, kill chain",
     color: "#3b2d8e",
@@ -1989,7 +2162,7 @@ const routePhases = [
     branchStations: ["weakness","vulnerabilities","attackPattern","killChain","indicators"]
   },
   {
-    phaseNumber: 4,
+    phaseNumber: 5,
     title: "Classify the Origin",
     desc: "Threat source classification (NIST SP 800-30) — not all threats come from attackers",
     color: "#A0522D",
@@ -1997,7 +2170,7 @@ const routePhases = [
     branchStations: ["originAdversarial","originAccidental","originStructural","originEnvironmental"]
   },
   {
-    phaseNumber: 5,
+    phaseNumber: 6,
     title: "Model the Attacks",
     desc: "Structured attack analysis — trees, abuse cases, paths, trust boundaries",
     color: "#d4721a",
@@ -2005,7 +2178,7 @@ const routePhases = [
     branchStations: ["attackTrees","abuseCases","attackPaths","trustBoundaries"]
   },
   {
-    phaseNumber: 6,
+    phaseNumber: 7,
     title: "Build Scenarios",
     desc: "Concrete threat scenarios — actors, vectors, exploitability, likelihood, impact",
     color: "#b7472a",
@@ -2013,7 +2186,7 @@ const routePhases = [
     branchStations: ["actor","threatProfile","attackVector","exploitability","methodologies","likelihood","impact","riskScore","riskAttributes"]
   },
   {
-    phaseNumber: 7,
+    phaseNumber: 8,
     title: "Assess the Risk",
     desc: "Risk ratings — inherent, residual, and target risk with formal assessment",
     color: "#6b6b6b",
@@ -2021,7 +2194,7 @@ const routePhases = [
     branchStations: ["inherentRisk","residualRisk","targetRisk","assessment"]
   },
   {
-    phaseNumber: 8,
+    phaseNumber: 9,
     title: "Apply Controls",
     desc: "Security controls — effectiveness, implementation traceability",
     color: "#27ae60",
@@ -2029,7 +2202,7 @@ const routePhases = [
     branchStations: ["effectiveness","appliesTo","implementedBy"]
   },
   {
-    phaseNumber: 9,
+    phaseNumber: 10,
     title: "Verify Governance",
     desc: "Requirements chain — controls satisfy requirements, verified by acceptance criteria",
     color: "#16a085",
@@ -2468,8 +2641,8 @@ const lineFilterMap = {
     hubs: ['threat']
   },
   cyan: {
-    stations: ['scope', 'components', 'services', 'assumptions', 'assets', 'dataStores', 'dataSets', 'relationships', 'zones', 'boundaries', 'flows', 'useCases', 'behaviors', 'behaviorInstances', 'behaviorGraphs', 'blueprintActors'],
-    hubs: ['blueprint']
+    stations: ['scope', 'services', 'assumptions', 'assets', 'dataStores', 'dataSets', 'relationships', 'zones', 'boundaries', 'flows', 'useCases', 'behaviors', 'behaviorInstances', 'behaviorGraphs', 'blueprintActors'],
+    hubs: ['blueprint', 'components']
   },
   orange: {
     stations: ['attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries'],
@@ -2494,13 +2667,17 @@ const lineFilterMap = {
   gold: {
     stations: ['businessObjectives'],
     hubs: []
+  },
+  magenta: {
+    stations: ['modelCard', 'modelParameters', 'quantitativeAnalysis', 'performanceMetrics', 'considerations', 'fairnessAssessments', 'environmentalImpact'],
+    hubs: ['components']
   }
 };
 
 const lineColorHexMap = {
   purple: '#3b2d8e', sienna: '#A0522D', cyan: '#2980b9',
   orange: '#d4721a', red: '#b7472a', gray: '#6b6b6b', green: '#27ae60', teal: '#16a085',
-  gold: '#9B7B2C'
+  gold: '#9B7B2C', magenta: '#c2185b'
 };
 
 let activeLineFilter = null;
