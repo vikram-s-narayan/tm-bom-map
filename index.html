@@ -427,7 +427,7 @@
   </div>
   <div class="legend">
     <div class="legend-item active" data-line="all">
-      <div class="legend-swatch" style="background:linear-gradient(90deg,#9B7B2C,#3b2d8e,#A0522D,#d4721a,#b7472a,#6b6b6b,#27ae60,#16a085,#2980b9,#c2185b);"></div>
+      <div class="legend-swatch" style="background:linear-gradient(90deg,#9B7B2C,#3b2d8e,#A0522D,#b7472a,#6b6b6b,#27ae60,#16a085,#2980b9,#c2185b);"></div>
       All
     </div>
     <div class="legend-item" data-line="gold">
@@ -444,15 +444,11 @@
     </div>
     <div class="legend-item" data-line="purple">
       <div class="legend-swatch" style="background:#3b2d8e;"></div>
-      Intelligence
+      Threats
     </div>
     <div class="legend-item" data-line="sienna">
       <div class="legend-swatch" style="background:#A0522D;"></div>
       Origin
-    </div>
-    <div class="legend-item" data-line="orange">
-      <div class="legend-swatch" style="background:#d4721a;"></div>
-      Threats
     </div>
     <div class="legend-item" data-line="red">
       <div class="legend-swatch" style="background:#b7472a;"></div>
@@ -480,10 +476,7 @@
       <marker id="cap-purple" markerWidth="8" markerHeight="8" refX="4" refY="4">
         <rect x="1" y="0" width="6" height="8" rx="1" fill="#3b2d8e"/>
       </marker>
-      <marker id="cap-orange" markerWidth="8" markerHeight="8" refX="4" refY="4">
-        <rect x="1" y="0" width="6" height="8" rx="1" fill="#d4721a"/>
-      </marker>
-      <marker id="cap-gray" markerWidth="8" markerHeight="8" refX="4" refY="4">
+<marker id="cap-gray" markerWidth="8" markerHeight="8" refX="4" refY="4">
         <rect x="1" y="0" width="6" height="8" rx="1" fill="#6b6b6b"/>
       </marker>
       <marker id="cap-red" markerWidth="8" markerHeight="8" refX="4" refY="4">
@@ -674,15 +667,15 @@
 
       <!-- Attack Trees → Abuse Cases → Threat (approach from right) -->
       <polyline points="960,380 880,380 620,360"
-                class="line-orange" stroke-width="7"/>
+                class="line-purple" stroke-width="7"/>
 
       <!-- Threats → Attack Paths (container-level library) -->
       <polyline points="350,360 380,440"
-                class="line-orange" stroke-width="7"/>
+                class="line-purple" stroke-width="7"/>
 
       <!-- Attack Paths → Trust Boundaries (container-level library) -->
       <polyline points="380,440 360,500"
-                class="line-orange" stroke-width="7"/>
+                class="line-purple" stroke-width="7"/>
 
       <!-- ============================================ -->
       <!-- RED LINES — Threat Scenario Properties       -->
@@ -759,12 +752,9 @@
       <polyline points="900,750 1050,860"
                 class="line-gray" stroke-width="7"/>
 
-      <!-- Assessment ↔ Risk hub (dashed — assessment is a peer in the 'risks' container, not a child of risk; references risks via bom-ref) -->
+      <!-- Assessment → Risk hub (both are peers in the 'risks' container) -->
       <polyline points="900,750 780,870"
-                stroke="#6b6b6b" stroke-width="5" fill="none"
-                stroke-dasharray="16,8" opacity="0.6"
-                stroke-linecap="round" stroke-linejoin="round"
-                data-lines="gray"/>
+                class="line-gray" stroke-width="7"/>
 
       <!-- Assessment → Risk Appetite -->
       <polyline points="780,870 700,920"
@@ -833,10 +823,10 @@
       <rect x="-28" y="762" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Behavior Graphs -->
 
       <!-- Red terminals -->
-      <rect x="952" y="372" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Trees -->
-      <rect x="872" y="372" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Abuse Cases -->
-      <rect x="372" y="432" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Attack Paths -->
-      <rect x="352" y="492" width="10" height="16" rx="2" fill="#d4721a"/>  <!-- Trust Boundaries -->
+      <rect x="952" y="372" width="10" height="16" rx="2" fill="#3b2d8e"/>  <!-- Attack Trees -->
+      <rect x="872" y="372" width="10" height="16" rx="2" fill="#3b2d8e"/>  <!-- Abuse Cases -->
+      <rect x="372" y="432" width="10" height="16" rx="2" fill="#3b2d8e"/>  <!-- Attack Paths -->
+      <rect x="352" y="492" width="10" height="16" rx="2" fill="#3b2d8e"/>  <!-- Trust Boundaries -->
 
       <!-- Red terminals (Scenario Properties — fan from Threat Scenario hub) -->
       <rect x="1122" y="262" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Threat Profile -->
@@ -1034,19 +1024,19 @@
       <!-- Orange stations (Attack Modeling, merged) -->
       <g class="station-dot" data-station="attackTrees">
         <circle class="hit-area" cx="960" cy="380" r="20"/>
-        <circle cx="960" cy="380" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="960" cy="380" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="abuseCases">
         <circle class="hit-area" cx="880" cy="380" r="20"/>
-        <circle cx="880" cy="380" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="880" cy="380" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="attackPaths">
         <circle class="hit-area" cx="380" cy="440" r="20"/>
-        <circle cx="380" cy="440" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="380" cy="440" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="trustBoundaries">
         <circle class="hit-area" cx="360" cy="500" r="20"/>
-        <circle cx="360" cy="500" r="6" fill="#fff" stroke="#d4721a" stroke-width="3" pointer-events="none"/>
+        <circle cx="360" cy="500" r="6" fill="#fff" stroke="#3b2d8e" stroke-width="3" pointer-events="none"/>
       </g>
 
       <!-- Orange stations -->
@@ -1287,19 +1277,19 @@
       </text>
 
       <!-- Orange labels (Attack Modeling, merged) -->
-      <text x="960" y="400" text-anchor="middle" class="station-label label-orange">
+      <text x="960" y="400" text-anchor="middle" class="station-label label-purple">
         <tspan x="960" dy="0">Attack</tspan>
         <tspan x="960" dy="14">Trees</tspan>
       </text>
-      <text x="880" y="400" text-anchor="middle" class="station-label label-orange">
+      <text x="880" y="400" text-anchor="middle" class="station-label label-purple">
         <tspan x="880" dy="0">Abuse</tspan>
         <tspan x="880" dy="14">Cases</tspan>
       </text>
-      <text x="395" y="438" text-anchor="start" class="station-label label-orange">
+      <text x="395" y="438" text-anchor="start" class="station-label label-purple">
         <tspan x="395" dy="0">Attack</tspan>
         <tspan x="395" dy="14">Paths</tspan>
       </text>
-      <text x="345" y="498" text-anchor="end" class="station-label label-orange">
+      <text x="345" y="498" text-anchor="end" class="station-label label-purple">
         <tspan x="345" dy="0">Trust</tspan>
         <tspan x="345" dy="14">Boundaries</tspan>
       </text>
@@ -1391,10 +1381,10 @@
 
       <!-- attackPath.realizes — refs from attack paths to threats -->
       <polyline points="380,440 500,420 620,360"
-                stroke="#d4721a" stroke-width="2.5" fill="none"
+                stroke="#3b2d8e" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
                 stroke-linecap="round" stroke-linejoin="round"
-                data-lines="orange,purple"/>
+                data-lines="purple"/>
 
       <!-- threat.behaviors — purple dashed to cyan Behaviors -->
       <polyline points="620,360 380,540 140,710"
@@ -1621,7 +1611,7 @@ const stationData = {
     title: "Threat",
     line: "Hub — Intelligence / Attack Modeling",
     color: "#222",
-    desc: "A documented threat describing what can go wrong, independent of any specific actor or occurrence. Hub connecting threat intelligence (purple) to attack modeling (orange).",
+    desc: "A documented threat describing what can go wrong, independent of any specific actor or occurrence. Hub connecting threat intelligence to attack modeling.",
     props: ["bom-ref", "name", "description", "source", "origin", "categories", "weaknesses", "relatedVulnerabilities", "attackPatterns", "attackTrees", "abuseCases", "killChainPhase", "behaviors", "indicators", "affectedAssets", "relatedBusinessObjectives", "mitigations", "externalReferences", "properties"],
     example: "SQL injection in product search allowing data exfiltration (STRIDE: Tampering, Information Disclosure)",
     schemaEntry: {
@@ -1947,35 +1937,35 @@ const stationData = {
     example: "Training: 1,287 kWh from AWS US-East, co2Equivalent: 0.58 tCO2eq; Inference: 0.003 kWh per request from solar-powered data center, co2Offset: 2.1 tCO2eq annual"
   },
 
-  // ── Orange — Attack Modeling ──
+  // ── Attack Modeling (merged into Threats/purple) ──
   attackTrees: {
     title: "Attack Trees",
-    line: "Attack Modeling",
-    color: "#d4721a",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
     desc: "AND/OR decomposition of attack goals into sub-goals. The tree has a root and nodes; each node has an operator, children, cost, skill, and detectability.",
     props: ["bom-ref", "name", "description", "root", "nodes (each: operator, children, attackPattern, weakness, cost, skill, detectability, mitigations)"],
     example: "Goal: Exfiltrate customer PII — OR(SQL injection in search, API parameter tampering, compromised admin credentials)"
   },
   abuseCases: {
     title: "Abuse Cases",
-    line: "Attack Modeling",
-    color: "#d4721a",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
     desc: "Adversarial counterpart to use cases — describes how an attacker misuses system functionality.",
     props: ["bom-ref", "name", "description", "abuser", "realizes", "preconditions", "mainFlow", "targets", "detectionOpportunities", "mitigations"],
     example: "Attacker abuses product search by injecting UNION SELECT to dump user table via error messages"
   },
   attackPaths: {
     title: "Attack Paths",
-    line: "Attack Modeling",
-    color: "#d4721a",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
     desc: "Chained multi-step attack sequences with an objective and actor. Each step carries technique, attack pattern, kill chain phase, source, destination, and boundary crossings.",
     props: ["bom-ref", "name", "description", "objective", "actor", "steps (each: technique { id, name, tactic, procedure }, attackPattern, killChainPhase, source, destination, boundaryCrossed, exploits, mitigations)", "realizes", "relatedRisks", "externalReferences", "properties"],
     example: "SQLi in search → extract DB credentials → direct DB connection → bulk PII exfiltration (crosses DMZ→Internal)"
   },
   trustBoundaries: {
     title: "Trust Boundaries",
-    line: "Attack Modeling",
-    color: "#d4721a",
+    line: "Threat Intelligence",
+    color: "#3b2d8e",
     desc: "Annotated trust boundary definitions referencing a blueprint boundary, with trust levels and associated threats and controls.",
     props: ["bom-ref", "boundary (ref)", "name", "description", "trustLevel", "threatsAtBoundary", "controlsAtBoundary", "properties"],
     example: "TB-01 annotates BOUNDARY-01 (DMZ→Internal): trustLevel: semi-trusted; threatsAtBoundary: [SQL injection, credential stuffing]; controlsAtBoundary: [WAF rules, rate limiter]"
@@ -2026,7 +2016,7 @@ const stationData = {
     title: "Threat Scenario",
     line: "Hub — Attack Modeling / Scenario Assessment",
     color: "#222",
-    desc: "A specific realization of a threat, in which an actor seeks to cause harm. References the threat it realizes and carries the scenario-specific assessment (likelihood, impact, risk score). Hub linking attack modeling (orange) to scenario assessment (red).",
+    desc: "A specific realization of a threat, in which an actor seeks to cause harm. References the threat it realizes and carries the scenario-specific assessment (likelihood, impact, risk score). Hub linking threat modeling to scenario assessment (red).",
     props: ["bom-ref", "name", "description", "threats", "actor", "threatProfile", "motivation", "intent", "accessLevel", "attackVector", "exploitability", "likelihood", "impact", "riskScore", "riskAttributes", "affectedAssets", "relatedRisks", "relatedVulnerabilities", "externalReferences", "properties"],
     example: "External attacker exploits SQL injection in product search to extract 2M customer PII records via blind injection",
     schemaEntry: {
@@ -2514,7 +2504,7 @@ const routePhases = [
     phaseNumber: 6,
     title: "Model the Attacks",
     desc: "Structured attack analysis — trees, abuse cases, paths, trust boundaries",
-    color: "#d4721a",
+    color: "#3b2d8e",
     waypoints: [[350,360],[620,360]],
     branchStations: ["attackTrees","abuseCases","attackPaths","trustBoundaries"]
   },
@@ -2974,7 +2964,7 @@ buildRegistry();
 // ─── Line Filter (click legend to isolate a line) ────
 const lineFilterMap = {
   purple: {
-    stations: ['threatModel', 'weakness', 'vulnerabilities', 'attackPattern', 'killChain', 'indicators'],
+    stations: ['threatModel', 'weakness', 'vulnerabilities', 'attackPattern', 'killChain', 'indicators', 'attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries'],
     hubs: ['blueprint', 'threat']
   },
   sienna: {
@@ -2984,10 +2974,6 @@ const lineFilterMap = {
   cyan: {
     stations: ['scope', 'assumptions', 'assets', 'dataStores', 'dataSets', 'relationships', 'zones', 'boundaries', 'flows', 'useCases', 'behaviors', 'behaviorInstances', 'behaviorGraphs', 'blueprintActors'],
     hubs: ['blueprint', 'components']
-  },
-  orange: {
-    stations: ['attackTrees', 'abuseCases', 'attackPaths', 'trustBoundaries'],
-    hubs: ['threatModel', 'threat']
   },
   red: {
     stations: ['actor', 'threatProfile', 'attackVector', 'exploitability', 'methodologies', 'likelihood', 'impact', 'riskScore', 'affectedAssets', 'riskAttributes'],
@@ -3017,7 +3003,7 @@ const lineFilterMap = {
 
 const lineColorHexMap = {
   purple: '#3b2d8e', sienna: '#A0522D', cyan: '#2980b9',
-  orange: '#d4721a', red: '#b7472a', gray: '#6b6b6b', green: '#27ae60', teal: '#16a085',
+  red: '#b7472a', gray: '#6b6b6b', green: '#27ae60', teal: '#16a085',
   gold: '#9B7B2C', magenta: '#c2185b'
 };
 
