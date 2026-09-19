@@ -542,12 +542,12 @@
       <polyline points="200,360 280,310"
                 class="line-cyan" stroke-width="7"/>
 
-      <!-- Components → Services (continue up-right) -->
-      <polyline points="280,310 360,280"
-                class="line-cyan" stroke-width="7"/>
-
       <!-- Blueprint → Relationships (branch down-right) -->
       <polyline points="200,360 230,395 260,430"
+                class="line-cyan" stroke-width="7"/>
+
+      <!-- Blueprint → Visualizations (branch left) -->
+      <polyline points="200,360 50,400"
                 class="line-cyan" stroke-width="7"/>
 
       <!-- ============================================ -->
@@ -736,8 +736,8 @@
       <rect x="112" y="282" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Assumptions -->
       <rect x="-8" y="482" width="10" height="16" rx="2" fill="#2980b9"/>    <!-- Data Stores -->
       <rect x="-78" y="512" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Data Sets -->
-      <rect x="352" y="272" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Services -->
       <rect x="252" y="422" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Relationships -->
+      <rect x="42" y="392" width="10" height="16" rx="2" fill="#2980b9"/>    <!-- Visualizations -->
       <rect x="162" y="752" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Blueprint Actors -->
       <rect x="42" y="732" width="10" height="16" rx="2" fill="#2980b9"/>    <!-- Behavior Instances -->
       <rect x="-28" y="762" width="10" height="16" rx="2" fill="#2980b9"/>   <!-- Behavior Graphs -->
@@ -870,13 +870,13 @@
         <circle cx="280" cy="310" r="14" fill="#fff" stroke="#222" stroke-width="3.5" pointer-events="none"/>
         <circle cx="280" cy="310" r="7" fill="#fff" stroke="#222" stroke-width="2" pointer-events="none"/>
       </g>
-      <g class="station-dot" data-station="services">
-        <circle class="hit-area" cx="360" cy="280" r="20"/>
-        <circle cx="360" cy="280" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
-      </g>
       <g class="station-dot" data-station="relationships">
         <circle class="hit-area" cx="260" cy="430" r="20"/>
         <circle cx="260" cy="430" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="visualizations">
+        <circle class="hit-area" cx="50" cy="400" r="20"/>
+        <circle cx="50" cy="400" r="6" fill="#fff" stroke="#2980b9" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="zones">
         <circle class="hit-area" cx="90" cy="510" r="20"/>
@@ -1149,8 +1149,8 @@
       <text x="-15" y="488" text-anchor="end" class="station-label label-cyan">Data Stores</text>
       <text x="-85" y="518" text-anchor="end" class="station-label label-cyan">Data Sets</text>
       <text x="265" y="305" text-anchor="end" class="station-label" style="font-size:14px; fill:#222;">Components</text>
-      <text x="375" y="278" text-anchor="start" class="station-label label-cyan">Services</text>
       <text x="275" y="428" text-anchor="start" class="station-label label-cyan">Relationships</text>
+      <text x="35" y="398" text-anchor="end" class="station-label label-cyan">Visualizations</text>
       <text x="65" y="508" text-anchor="end" class="station-label label-cyan">Zones</text>
       <text x="60" y="558" text-anchor="end" class="station-label label-cyan">Boundaries</text>
       <text x="65" y="615" text-anchor="end" class="station-label label-cyan">Flows</text>
@@ -1563,17 +1563,9 @@ const stationData = {
     title: "Components",
     line: "Hub — System Model / AI Model Card",
     color: "#222",
-    desc: "Top-level BOM inventory of software, hardware, and ML model components — libraries, frameworks, applications, containers, devices, firmware, and machine-learning-models. Hub connecting the system model (cyan) to AI/ML model cards (magenta). Components of type machine-learning-model carry a modelCard object describing training parameters, performance metrics, and ethical considerations.",
-    props: ["type (application | framework | library | container | platform | device | firmware | file | machine-learning-model | data | cryptographic-asset)", "bom-ref", "name", "version", "description", "group", "scope", "parties", "hashes", "licenses", "identifiers", "pedigree", "components", "evidence", "modelCard", "releaseNotes", "tags", "properties", "externalReferences"],
-    example: "Express.js v4.18.2 (library); PostgreSQL v15 (application); GPT-4-turbo (machine-learning-model, with modelCard)"
-  },
-  services: {
-    title: "Services",
-    line: "System Model",
-    color: "#2980b9",
-    desc: "Top-level BOM inventory of services — APIs, microservices, and cloud services that the system depends on or exposes. Each service can declare endpoints, trust boundary crossings, and data classifications.",
-    props: ["bom-ref", "provider", "group", "name", "version", "description", "endpoints", "authenticated", "x-trust-boundary", "trustZone", "data", "licenses", "services", "releaseNotes", "tags", "properties", "externalReferences"],
-    example: "Stripe Payment API v2023-10-16; AWS S3 storage service; internal Auth microservice"
+    desc: "Top-level BOM inventory of software, hardware, and ML model components — libraries, frameworks, applications, containers, devices, firmware, and machine-learning-models. Hub connecting the system model (cyan) to AI/ML model cards (magenta). Components of type machine-learning-model carry a modelCard object. Components of type service carry endpoints (URI array) and dataProfiles.",
+    props: ["type (application | framework | library | container | platform | operating-system | device | device-driver | firmware | file | machine-learning-model | data | cryptographic-asset | material | service)", "bom-ref", "name", "version", "description", "group", "scope", "parties", "origins", "hashes", "licenses", "identifiers", "pedigree", "components", "evidence", "modelCard", "endpoints (service only)", "dataProfiles (service only)", "releaseNotes", "tags", "properties", "externalReferences"],
+    example: "Express.js v4.18.2 (library); PostgreSQL v15 (application); GPT-4-turbo (machine-learning-model, with modelCard); Stripe API (service, endpoints: [https://api.stripe.com/v1])"
   },
   assumptions: {
     title: "Assumptions",
@@ -1606,6 +1598,14 @@ const stationData = {
     desc: "Named data collections distinct from storage — with data profiles, data objects, record counts, ownership, and placement in data stores.",
     props: ["bom-ref", "name", "description", "dataProfiles", "dataObjects", "recordCount", "owners", "authorization", "placements", "properties"],
     example: "Customer PII dataset — names, emails, addresses, phone numbers (classified: Confidential, retention: 7 years)"
+  },
+  visualizations: {
+    title: "Visualizations",
+    line: "System Model",
+    color: "#2980b9",
+    desc: "Visual representations of the blueprint model — 21 predefined diagram types (data-flow, sequence, state-machine, attack-tree, component, deployment, architecture, C4 container, etc.) plus custom types. Each visualization can carry an inline attachment or external URL, a detail level, references to the elements depicted, interactivity flag, and named layers.",
+    props: ["bom-ref", "name", "description", "type (21 predefined + custom)", "attachment", "url", "level (detailed | high | medium | overview)", "elements", "interactive", "layers", "properties"],
+    example: "DFD-01: type: data-flow, level: detailed, elements: [payment-service, auth-service, stripe-api], attachment: base64-encoded SVG; ARCH-01: type: architecture, level: overview, url: https://wiki.internal/arch-diagram"
   },
   relationships: {
     title: "Relationships",
@@ -2143,7 +2143,7 @@ const routePhases = [
     desc: "Blueprint defines the system architecture — assets, zones, flows, and actors",
     color: "#2980b9",
     waypoints: [[200,360]],
-    branchStations: ["scope","components","services","assumptions","assets","dataStores","dataSets","relationships","zones","boundaries","flows","useCases","behaviors","behaviorInstances","behaviorGraphs","blueprintActors"]
+    branchStations: ["scope","components","assumptions","assets","dataStores","dataSets","relationships","zones","boundaries","flows","useCases","behaviors","behaviorInstances","behaviorGraphs","blueprintActors"]
   },
   {
     phaseNumber: 3,
@@ -2641,7 +2641,7 @@ const lineFilterMap = {
     hubs: ['threat']
   },
   cyan: {
-    stations: ['scope', 'services', 'assumptions', 'assets', 'dataStores', 'dataSets', 'relationships', 'zones', 'boundaries', 'flows', 'useCases', 'behaviors', 'behaviorInstances', 'behaviorGraphs', 'blueprintActors'],
+    stations: ['scope', 'assumptions', 'assets', 'dataStores', 'dataSets', 'relationships', 'zones', 'boundaries', 'flows', 'useCases', 'behaviors', 'behaviorInstances', 'behaviorGraphs', 'blueprintActors'],
     hubs: ['blueprint', 'components']
   },
   orange: {
