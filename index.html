@@ -326,6 +326,96 @@
   #edit-btn.active { background: #d4721a; color: #fff; }
   #controls #reset-layout-btn { font-size: 11px; width: auto; padding: 0 10px; letter-spacing: 0.3px; display: none; }
   #controls.edit-mode-controls #reset-layout-btn { display: flex; }
+
+  /* Schema panel */
+  #schema-panel {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 480px;
+    max-width: 90vw;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    z-index: 300;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 24px rgba(0,0,0,0.4);
+  }
+
+  #schema-panel.open { transform: translateX(0); }
+
+  .schema-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #333;
+    flex-shrink: 0;
+  }
+
+  .schema-header h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .schema-header .schema-subtitle {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .schema-close {
+    background: none;
+    border: 1px solid #444;
+    color: #cdd6f4;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .schema-close:hover { background: #333; }
+
+  .schema-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+    scrollbar-width: thin;
+    scrollbar-color: #444 transparent;
+  }
+
+  .schema-body pre {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+  }
+
+  .schema-body .json-key { color: #89b4fa; }
+  .schema-body .json-string { color: #a6e3a1; }
+  .schema-body .json-number { color: #fab387; }
+  .schema-body .json-bool { color: #f38ba8; }
+  .schema-body .json-null { color: #6c7086; }
+  .schema-body .json-bracket { color: #9399b2; }
+
+  .schema-hint {
+    font-size: 11px;
+    color: #89b4fa;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+
+  .schema-hint:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -1402,6 +1492,19 @@
   <div class="tt-props"></div>
 </div>
 
+<div id="schema-panel">
+  <div class="schema-header">
+    <div>
+      <div class="schema-subtitle">CycloneDX 2.0 Schema</div>
+      <h2 id="schema-panel-title"></h2>
+    </div>
+    <button class="schema-close" id="schema-close" title="Close">&times;</button>
+  </div>
+  <div class="schema-body">
+    <pre id="schema-panel-content"></pre>
+  </div>
+</div>
+
 <div id="phase-banner">
   <div class="phase-number" id="phase-num">1</div>
   <div class="phase-info">
@@ -1451,7 +1554,36 @@ const stationData = {
     color: "#222",
     desc: "System architecture model — defines assets, zones, boundaries, flows, actors, data stores, relationships, and assumptions that form the attack surface. Hub connecting the system model (cyan) to threat intelligence (purple).",
     props: ["bom-ref", "name", "description", "metadata", "modelTypes", "scope", "assets", "behaviors", "dataStores", "dataSets", "zones", "boundaries", "flows", "relationships", "actors", "assumptions", "visualizations", "useCases", "requirements", "externalReferences", "properties"],
-    example: "E-commerce platform with payment gateway, user database, CDN, and third-party shipping API"
+    example: "E-commerce platform with payment gateway, user database, CDN, and third-party shipping API",
+    schemaEntry: {
+      title: "Blueprint",
+      description: "A versatile, machine-readable model designed to support a wide range of analytical activities, from use case documentation and behavioural analysis to comprehensive system-level threat and risk modelling.",
+      type: "object",
+      required: ["name", "modelTypes"],
+      properties: {
+        "bom-ref": { description: "An identifier which can be used to reference the blueprint elsewhere using a bom-ref or bom-link.", $ref: "cyclonedx-common-2.0/refType" },
+        name: { title: "Name", type: "string", description: "The name of the blueprint, used to identify this model within the BOM and distinguish it from other blueprints." },
+        description: { title: "Description", type: "string", description: "A detailed explanation of the blueprint, including its scope, the system or subsystem it represents, and any relevant context about the modelling objectives or intended audience." },
+        metadata: { description: "Metadata about the blueprint.", $ref: "cyclonedx-blueprint-2.0/metadata" },
+        modelTypes: { title: "Model Types", type: "array", description: "The types of models being represented.", $ref: "cyclonedx-blueprint-2.0/modelType" },
+        scope: { description: "Specifies what is included and excluded from the blueprint model.", $ref: "cyclonedx-blueprint-2.0/scope" },
+        assets: { title: "Assets", type: "array", description: "The assets (components, services, data, actors) included in the model." },
+        behaviors: { description: "Behaviors performed by objects within the BOM.", $ref: "cyclonedx-behavior-2.0/behaviors" },
+        dataStores: { title: "Data Stores", type: "array", description: "Structured description of data stores used in the model." },
+        dataSets: { title: "Data Sets", type: "array", description: "Datasets handled by the system, including placements and sensitivity." },
+        zones: { title: "Zones", type: "array", description: "Logical, physical, or trust zones that group assets with similar characteristics." },
+        boundaries: { title: "Boundaries", type: "array", description: "Boundaries between zones." },
+        flows: { title: "Flows", type: "array", description: "Data, control, or process flows between assets." },
+        relationships: { title: "Relationships", type: "array", description: "Static, structural relationships between elements of the model, complementing the runtime exchanges captured by flows." },
+        actors: { title: "Actors", type: "array", description: "Human or system actors involved in the model, distinct from assets." },
+        assumptions: { title: "Assumptions", type: "array", description: "Assumptions made during the modeling process." },
+        visualizations: { title: "Visualizations", type: "array", description: "Visual representations of the model." },
+        useCases: { title: "Use Cases", type: "array", description: "Use cases analyzed as part of the model, linking actors, goals, and steps to the blueprint's assets, flows, and requirements." },
+        requirements: { type: "array", description: "References using bom-link or bom-ref to the requirements derived from or related to this model." },
+        externalReferences: { $ref: "cyclonedx-common-2.0/externalReferences" },
+        properties: { $ref: "cyclonedx-common-2.0/properties" }
+      }
+    }
   },
   scope: {
     title: "Scope",
@@ -1467,7 +1599,23 @@ const stationData = {
     color: "#222",
     desc: "The top-level 'threats' object in the BOM — holds threats, scenarios, attack patterns, attack trees, abuse cases, trust boundaries, and methodologies. This is the threat model.",
     props: ["threats", "scenarios", "attackPatterns", "attackTrees", "attackPaths", "abuseCases", "trustBoundaries", "methodologies"],
-    example: "STRIDE analysis of the checkout flow covering payment, authentication, and order services"
+    example: "STRIDE analysis of the checkout flow covering payment, authentication, and order services",
+    schemaEntry: {
+      title: "Threats",
+      description: "Threat-modelling content, including the documented threats, the scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross.",
+      type: "object",
+      properties: {
+        threats: { title: "Threats", type: "array", description: "The documented threats. Each describes what can go wrong, independent of any specific actor or occurrence." },
+        scenarios: { title: "Scenarios", type: "array", description: "The threat scenarios, each realizing one or more documented threats in a specific way." },
+        attackPatterns: { title: "Attack Patterns", type: "array", description: "A library of attack patterns, typically aligned with CAPEC, that threats and scenarios can reference." },
+        attackTrees: { title: "Attack Trees", type: "array", description: "Attack trees that decompose attacker goals into sub-goals and techniques." },
+        attackPaths: { title: "Attack Paths", type: "array", description: "Attack paths that describe the ordered progression of an attack across elements and trust boundaries, including lateral movement." },
+        abuseCases: { title: "Abuse Cases", type: "array", description: "Abuse or misuse cases that describe how the system can be exercised by an adversary." },
+        trustBoundaries: { title: "Trust Boundaries", type: "array", description: "The trust boundaries of the system, extending the architectural boundaries defined in a blueprint with trust semantics." },
+        methodologies: { title: "Methodologies", type: "array", description: "The threat modeling methodologies applied to produce this threat model, such as STRIDE, LINDDUN, PASTA, or attack trees." },
+        properties: { $ref: "cyclonedx-common-2.0/properties" }
+      }
+    }
   },
   threat: {
     title: "Threat",
@@ -1475,7 +1623,34 @@ const stationData = {
     color: "#222",
     desc: "A documented threat describing what can go wrong, independent of any specific actor or occurrence. Hub connecting threat intelligence (purple) to attack modeling (orange).",
     props: ["bom-ref", "name", "description", "source", "origin", "categories", "weaknesses", "relatedVulnerabilities", "attackPatterns", "attackTrees", "abuseCases", "killChainPhase", "behaviors", "indicators", "affectedAssets", "relatedBusinessObjectives", "mitigations", "externalReferences", "properties"],
-    example: "SQL injection in product search allowing data exfiltration (STRIDE: Tampering, Information Disclosure)"
+    example: "SQL injection in product search allowing data exfiltration (STRIDE: Tampering, Information Disclosure)",
+    schemaEntry: {
+      title: "Threat",
+      description: "A documented threat, describing what can go wrong independent of any specific actor or occurrence. A threat can be catalogued on its own; a threat scenario references it to describe a specific realization.",
+      type: "object",
+      required: ["bom-ref", "name"],
+      properties: {
+        "bom-ref": { description: "An identifier which can be used to reference the threat elsewhere using a bom-ref or bom-link.", $ref: "cyclonedx-common-2.0/refType" },
+        name: { title: "Name", type: "string", description: "The name of the threat." },
+        description: { title: "Description", type: "string", description: "A description of the threat." },
+        source: { title: "Source", type: "string", description: "The source of the threat, such as a threat intelligence feed, a threat catalogue, or an analysis activity." },
+        origin: { title: "Origin", description: "The nature of the threat source (NIST SP 800-30). oneOf: enum [adversarial, accidental, structural, environmental] or custom { name, description }." },
+        categories: { title: "Categories", type: "array", description: "Methodology-specific categories (e.g. STRIDE, MAESTRO) that this threat falls under." },
+        weaknesses: { description: "The weaknesses (e.g. CWE) that this threat exploits.", $ref: "cyclonedx-weakness-2.0/weaknesses" },
+        relatedVulnerabilities: { type: "array", description: "References (bom-ref/bom-link) to vulnerabilities this threat exploits." },
+        attackPatterns: { title: "Attack Patterns", type: "array", description: "References (bom-ref/bom-link) to attack patterns by which this threat is carried out." },
+        attackTrees: { title: "Attack Trees", type: "array", description: "References (bom-ref/bom-link) to attack trees that decompose this threat." },
+        abuseCases: { title: "Abuse Cases", type: "array", description: "References (bom-ref/bom-link) to abuse cases that illustrate how this threat can be exercised." },
+        killChainPhase: { description: "The kill chain phase at which this threat operates.", $ref: "cyclonedx-threat-2.0/killChainPhase", enum: ["reconnaissance","weaponization","delivery","exploitation","installation","command-and-control","actions-on-objectives"] },
+        behaviors: { title: "Behaviors", type: "array", description: "References (bom-ref/bom-link) to declared behaviors that constitute the intent of this threat." },
+        indicators: { description: "Indicators of compromise (IoC), indicators of attack (IoA), and detection signatures.", $ref: "cyclonedx-threat-2.0/indicators" },
+        affectedAssets: { title: "Affected Assets", type: "array", description: "References (bom-ref/bom-link) to the kinds of assets this threat affects." },
+        relatedBusinessObjectives: { type: "array", description: "References (bom-ref/bom-link) to business objectives this threat endangers." },
+        mitigations: { title: "Mitigations", type: "array", description: "References (bom-ref/bom-link) to controls that mitigate this threat." },
+        externalReferences: { $ref: "cyclonedx-common-2.0/externalReferences" },
+        properties: { $ref: "cyclonedx-common-2.0/properties" }
+      }
+    }
   },
   weakness: {
     title: "Weakness (CWE)",
@@ -1565,7 +1740,41 @@ const stationData = {
     color: "#222",
     desc: "Top-level BOM inventory of software, hardware, and ML model components — libraries, frameworks, applications, containers, devices, firmware, and machine-learning-models. Hub connecting the system model (cyan) to AI/ML model cards (magenta). Components of type machine-learning-model carry a modelCard object. Components of type service carry endpoints (URI array) and dataProfiles.",
     props: ["type (application | framework | library | container | platform | operating-system | device | device-driver | firmware | file | machine-learning-model | data | cryptographic-asset | material | service)", "bom-ref", "name", "version", "description", "group", "scope", "parties", "origins", "hashes", "licenses", "identifiers", "pedigree", "components", "evidence", "modelCard", "endpoints (service only)", "dataProfiles (service only)", "releaseNotes", "tags", "properties", "externalReferences"],
-    example: "Express.js v4.18.2 (library); PostgreSQL v15 (application); GPT-4-turbo (machine-learning-model, with modelCard); Stripe API (service, endpoints: [https://api.stripe.com/v1])"
+    example: "Express.js v4.18.2 (library); PostgreSQL v15 (application); GPT-4-turbo (machine-learning-model, with modelCard); Stripe API (service, endpoints: [https://api.stripe.com/v1])",
+    schemaEntry: {
+      title: "Component",
+      description: "A software, hardware, or ML model component in the BOM inventory. The type field determines which additional properties apply (e.g. modelCard for machine-learning-model, endpoints and dataProfiles for service, classification and boardLocation for device).",
+      type: "object",
+      required: ["type", "name"],
+      properties: {
+        type: { title: "Component Type", type: "string", description: "Specifies the type of component.", enum: ["application","framework","library","container","platform","operating-system","device","device-driver","firmware","file","machine-learning-model","data","cryptographic-asset","material","service"] },
+        "mime-type": { title: "Mime-Type", type: "string", description: "The mime-type of the component. When used on file components, provides additional context about the kind of file." },
+        "bom-ref": { description: "An identifier which can be used to reference the component elsewhere in the BOM.", $ref: "cyclonedx-common-2.0/refType" },
+        parties: { description: "The parties associated with the component.", $ref: "cyclonedx-party-2.0/parties" },
+        origins: { title: "Component Origins", type: "array", description: "The geographic origins of the component, each expressed as a distribution across one or more countries or subdivisions." },
+        group: { title: "Component Group", type: "string", description: "The grouping name or identifier. This will often be a shortened, single name of the company or project that produced the component." },
+        name: { title: "Component Name", type: "string", description: "The name of the component. Examples: commons-lang3 and jquery." },
+        version: { title: "Component Version", type: "string", description: "The component version. The version should ideally comply with semantic versioning but is not enforced." },
+        versionRange: { title: "Component Version Range", type: "string", description: "For an external component, this specifies the accepted version range (Package URL vers syntax). Mutually exclusive with version." },
+        isExternal: { title: "Component Is External", type: "boolean", description: "Whether this component is external — not part of an assembly, but expected to be provided by the environment." },
+        description: { title: "Component Description", type: "string", description: "Specifies a description for the component." },
+        scope: { title: "Component Scope", type: "string", description: "Specifies the scope of the component.", enum: ["required","optional","excluded"] },
+        hashes: { title: "Component Hashes", type: "array", description: "The hashes of the component." },
+        licenses: { title: "Component License(s)", $ref: "cyclonedx-license-2.0/licenseChoice" },
+        copyright: { $ref: "cyclonedx-component-2.0/copyrightText" },
+        identifiers: { $ref: "cyclonedx-component-2.0/identifiers" },
+        pedigree: { title: "Component Pedigree", type: "object", description: "Documents complex supply chain scenarios — ancestors, descendants, variants, commits, and patches." },
+        components: { title: "Components", type: "array", description: "A list of components included in the parent component. Provides a way to specify a hierarchical representation of component assemblies." },
+        evidence: { title: "Evidence", description: "Evidence collected through various forms of extraction or analysis.", $ref: "cyclonedx-component-2.0/componentEvidence" },
+        modelCard: { title: "AI/ML Model Card", description: "AI/ML model card. Applicable only to components of type machine-learning-model.", $ref: "cyclonedx-ai-modelcard-2.0/modelCard" },
+        endpoints: { title: "Endpoints", type: "array", description: "The endpoint URIs of the service. May only be used for components of type service." },
+        dataProfiles: { title: "Data Profiles", type: "array", description: "The data handled by the service, characterized by data profiles. May only be used for components of type service." },
+        releaseNotes: { title: "Release Notes", $ref: "cyclonedx-release-notes-2.0/releaseNotes" },
+        tags: { title: "Tags", $ref: "cyclonedx-common-2.0/tags" },
+        properties: { $ref: "cyclonedx-common-2.0/properties" },
+        externalReferences: { $ref: "cyclonedx-common-2.0/externalReferences" }
+      }
+    }
   },
   assumptions: {
     title: "Assumptions",
@@ -1819,7 +2028,35 @@ const stationData = {
     color: "#222",
     desc: "A specific realization of a threat, in which an actor seeks to cause harm. References the threat it realizes and carries the scenario-specific assessment (likelihood, impact, risk score). Hub linking attack modeling (orange) to scenario assessment (red).",
     props: ["bom-ref", "name", "description", "threats", "actor", "threatProfile", "motivation", "intent", "accessLevel", "attackVector", "exploitability", "likelihood", "impact", "riskScore", "riskAttributes", "affectedAssets", "relatedRisks", "relatedVulnerabilities", "externalReferences", "properties"],
-    example: "External attacker exploits SQL injection in product search to extract 2M customer PII records via blind injection"
+    example: "External attacker exploits SQL injection in product search to extract 2M customer PII records via blind injection",
+    schemaEntry: {
+      title: "Threat Scenario",
+      description: "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threat it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits and risk assessment, such as motivation, intent, access level, likelihood, and impact.",
+      type: "object",
+      required: ["bom-ref", "name", "threats"],
+      properties: {
+        "bom-ref": { description: "An identifier which can be used to reference the threat scenario elsewhere using a bom-ref or bom-link.", $ref: "cyclonedx-common-2.0/refType" },
+        name: { title: "Name", type: "string", description: "The name of the threat scenario." },
+        description: { title: "Description", type: "string", description: "A description of the threat scenario." },
+        threats: { title: "Threats", type: "array", description: "References using bom-link or bom-ref to the threats that this scenario realizes. A scenario realizes one or more threats." },
+        actor: { description: "Reference using bom-link or bom-ref to the party that is the actor in this scenario. Named adversary groups are organizations and abstract attacker classes are personas.", $ref: "cyclonedx-common-2.0/refLinkType" },
+        threatProfile: { description: "Reference using bom-link or bom-ref to a reusable threat profile that describes the durable capabilities of the actor.", $ref: "cyclonedx-common-2.0/refLinkType" },
+        motivation: { title: "Motivation", type: "array", description: "The motivations of the actor in this scenario.", enum: ["financial","political","personal","ideological","espionage","destruction","disruption","reputation","curiosity","competitive","revenge","activism"] },
+        intent: { title: "Intent", type: "string", description: "The intent of the actor in this scenario.", enum: ["accidental","opportunistic","targeted","persistent"] },
+        accessLevel: { title: "Access Level", type: "string", description: "The level of access the actor is assumed to have in this scenario.", enum: ["none","external","internal","privileged","physical"] },
+        attackVector: { description: "The attack vector for this scenario.", $ref: "cyclonedx-threat-2.0/attackVector" },
+        exploitability: { description: "The exploitability assessment for this scenario.", $ref: "cyclonedx-threat-2.0/exploitability" },
+        likelihood: { description: "Probability assessment of the scenario occurring.", $ref: "cyclonedx-risk-2.0/likelihood" },
+        impact: { description: "Severity of consequences if the scenario materializes.", $ref: "cyclonedx-risk-2.0/impact" },
+        riskScore: { description: "Quantified risk rating on the threat scenario using a chosen methodology.", $ref: "cyclonedx-risk-2.0/riskScore" },
+        riskAttributes: { title: "Risk Attributes", type: "array", description: "The security and privacy attributes that this threat would compromise if realized." },
+        affectedAssets: { title: "Affected Assets", type: "array", description: "References using bom-link or bom-ref to the assets affected in this scenario." },
+        relatedRisks: { title: "Related Risks", type: "array", description: "References using bom-link or bom-ref to the risks that this scenario contributes to." },
+        relatedVulnerabilities: { type: "array", description: "References using bom-link or bom-ref to the vulnerabilities exploited in this scenario." },
+        externalReferences: { $ref: "cyclonedx-common-2.0/externalReferences" },
+        properties: { $ref: "cyclonedx-common-2.0/properties" }
+      }
+    }
   },
   likelihood: {
     title: "Likelihood",
@@ -1861,7 +2098,35 @@ const stationData = {
     color: "#222",
     desc: "The formal risk object connecting risk ratings to responses and controls. Domains classify the risk (e.g. operational, financial, regulatory, reputational, safety, privacy). Has bom-ref cross-references back to threats, vulnerabilities, weaknesses, requirements, standards, claims, business objectives, and affected subjects.",
     props: ["bom-ref", "name", "statement", "description", "domains", "affects", "relatedThreats", "relatedVulnerabilities", "relatedWeaknesses", "relatedRequirements", "relatedStandards", "relatedClaims", "relatedBusinessObjectives", "inherentRisk", "residualRisk", "targetRisk", "responses", "status", "owner", "properties"],
-    example: "RISK-007: Customer data breach via SQL injection — Inherent: Critical, Residual: Medium, Target: Low"
+    example: "RISK-007: Customer data breach via SQL injection — Inherent: Critical, Residual: Medium, Target: Low",
+    schemaEntry: {
+      title: "Risk",
+      description: "A documented risk identified through risk analysis. Separates inherent, residual, and target ratings so risk reduction is explicit. Framework-neutral — accommodates ISO 31000, NIST SP 800-30, FAIR, OWASP Risk Rating, DREAD, FMEA, and others.",
+      type: "object",
+      required: ["bom-ref", "name", "statement"],
+      properties: {
+        "bom-ref": { description: "An identifier which can be used to reference the risk elsewhere using a bom-ref or bom-link.", $ref: "cyclonedx-common-2.0/refType" },
+        name: { type: "string", description: "A human-readable name for the risk." },
+        statement: { type: "string", description: "Structured risk statement describing source, event, and impact." },
+        description: { type: "string", description: "Additional narrative about the risk." },
+        domains: { type: "array", description: "The risk domains this risk affects.", $ref: "cyclonedx-risk-2.0/riskDomain" },
+        affects: { type: "array", description: "References using bom-link or bom-ref to the subjects this risk concerns. A subject may be a component, service, dataset, model, or party, including a group at risk of being systematically disadvantaged." },
+        relatedThreats: { type: "array", description: "References using bom-link or bom-ref to the threats or threat scenarios from a threat model that inform this risk." },
+        relatedVulnerabilities: { type: "array", description: "References using bom-link or bom-ref to the vulnerabilities that inform this risk." },
+        relatedWeaknesses: { type: "array", description: "References using bom-link or bom-ref to the weaknesses that inform this risk." },
+        relatedRequirements: { type: "array", description: "References using bom-link or bom-ref to the requirements whose absence or non-conformance gives rise to this risk." },
+        relatedStandards: { type: "array", description: "References using bom-link or bom-ref to the standards whose non-conformance gives rise to this risk." },
+        relatedClaims: { type: "array", description: "References using bom-link or bom-ref to the conformance claims that give rise to this risk." },
+        relatedBusinessObjectives: { type: "array", description: "References using bom-link or bom-ref to the business objectives this risk threatens." },
+        inherentRisk: { description: "The assessed risk before any responses are applied.", $ref: "cyclonedx-risk-2.0/rating" },
+        residualRisk: { description: "The assessed risk remaining after responses are applied.", $ref: "cyclonedx-risk-2.0/rating" },
+        targetRisk: { description: "The risk level the organization aims to reach for this risk.", $ref: "cyclonedx-risk-2.0/rating" },
+        responses: { type: "array", description: "The responses applied to this risk.", $ref: "cyclonedx-risk-2.0/riskResponse" },
+        status: { title: "Status", description: "The lifecycle status of the risk.", enum: ["identified","assessed","mitigated","accepted","transferred","retired"] },
+        owner: { description: "The party accountable for this risk.", $ref: "cyclonedx-party-2.0/partyChoice" },
+        properties: { $ref: "cyclonedx-common-2.0/properties" }
+      }
+    }
   },
   riskScore: {
     title: "Risk Score",
@@ -1928,7 +2193,27 @@ const stationData = {
     color: "#222",
     desc: "A security control that mitigates threats. Hub connecting controls & mitigation (green) to requirements & governance (teal).",
     props: ["bom-ref", "name", "description", "category", "status", "appliesTo", "implementedBy", "satisfies", "effectiveness", "owner", "externalReferences", "properties"],
-    example: "CTL-019: Parameterized database queries — preventive control applied to all services querying PostgreSQL"
+    example: "CTL-019: Parameterized database queries — preventive control applied to all services querying PostgreSQL",
+    schemaEntry: {
+      title: "Control",
+      description: "A safeguard or countermeasure that protects systems, data, or operations. A control binds the elements that implement it to the requirements it satisfies, and records its implementation status and assessed effectiveness.",
+      type: "object",
+      required: ["bom-ref", "name"],
+      properties: {
+        "bom-ref": { description: "An identifier which can be used to reference the control elsewhere using a bom-ref or bom-link.", $ref: "cyclonedx-common-2.0/refType" },
+        name: { title: "Name", type: "string", description: "The name of the control." },
+        description: { title: "Description", type: "string", description: "A description of the control." },
+        category: { title: "Category", description: "The category of the control.", enum: ["preventive","detective","corrective","compensating","deterrent","recovery"] },
+        status: { title: "Status", description: "The implementation status of the control.", enum: ["recommended","proposed","approved","rejected","planned","in-progress","implemented","verified","decommissioned"] },
+        appliesTo: { title: "Applies To", type: "array", description: "References using bom-link or bom-ref to the elements the control protects, such as components, services, zones, or boundaries. A control without this property applies to the organization or system as a whole." },
+        implementedBy: { title: "Implemented By", type: "array", description: "References using bom-link or bom-ref to the components, services, formulation workflows, or parties that implement the control." },
+        satisfies: { title: "Satisfies", type: "array", description: "References using bom-link or bom-ref to the requirements the control satisfies, including requirements defined within standards." },
+        effectiveness: { title: "Effectiveness", description: "The assessed effectiveness of the control.", $ref: "cyclonedx-control-2.0/effectiveness" },
+        owner: { description: "The party accountable for the control.", $ref: "cyclonedx-party-2.0/partyChoice" },
+        externalReferences: { $ref: "cyclonedx-common-2.0/externalReferences" },
+        properties: { $ref: "cyclonedx-common-2.0/properties" }
+      }
+    }
   },
   effectiveness: {
     title: "Effectiveness",
@@ -2089,6 +2374,9 @@ function showTooltip(stationInfo, e) {
   if (stationInfo.example) {
     tooltipContent += '<br><br><span>Example:</span> ' + stationInfo.example;
   }
+  if (stationInfo.schemaEntry) {
+    tooltipContent += '<br><span class="schema-hint">Click station to view schema definition →</span>';
+  }
   tooltip.querySelector('.tt-props').innerHTML = tooltipContent;
 
   positionTooltip(e);
@@ -2125,6 +2413,59 @@ document.querySelectorAll('.station-dot, .hub-circle').forEach(stationElement =>
   stationElement.addEventListener('mouseenter', (e) => showTooltip(stationInfo, e));
   stationElement.addEventListener('mousemove', (e) => positionTooltip(e));
   stationElement.addEventListener('mouseleave', () => scheduleHide());
+  stationElement.addEventListener('click', (e) => {
+    if (mapGroup.classList.contains('edit-mode')) return;
+    if (!stationInfo.schemaEntry) return;
+    e.stopPropagation();
+    openSchemaPanel(stationInfo);
+  });
+});
+
+// ─── Schema Panel ────────────────────────────────────
+const schemaPanel = document.getElementById('schema-panel');
+const schemaPanelTitle = document.getElementById('schema-panel-title');
+const schemaPanelContent = document.getElementById('schema-panel-content');
+
+function syntaxHighlight(jsonObj) {
+  const jsonString = JSON.stringify(jsonObj, null, 2);
+  return jsonString.replace(
+    /("(?:\\.|[^"\\])*")\s*:/g,
+    '<span class="json-key">$1</span>:'
+  ).replace(
+    /:\s*("(?:\\.|[^"\\])*")/g,
+    ': <span class="json-string">$1</span>'
+  ).replace(
+    /:\s*(\d+(?:\.\d+)?)/g,
+    ': <span class="json-number">$1</span>'
+  ).replace(
+    /:\s*(true|false)/g,
+    ': <span class="json-bool">$1</span>'
+  ).replace(
+    /:\s*(null)/g,
+    ': <span class="json-null">$1</span>'
+  ).replace(
+    /([[\]{}])/g,
+    '<span class="json-bracket">$1</span>'
+  );
+}
+
+function openSchemaPanel(stationInfo) {
+  schemaPanelTitle.textContent = stationInfo.schemaEntry.title || stationInfo.title;
+  schemaPanelContent.innerHTML = syntaxHighlight(stationInfo.schemaEntry);
+  schemaPanel.classList.add('open');
+}
+
+function closeSchemaPanel() {
+  schemaPanel.classList.remove('open');
+}
+
+document.getElementById('schema-close').addEventListener('click', closeSchemaPanel);
+
+document.addEventListener('keydown', (keyEvent) => {
+  if (keyEvent.key === 'Escape' && schemaPanel.classList.contains('open')) {
+    closeSchemaPanel();
+    keyEvent.stopPropagation();
+  }
 });
 
 // ─── Route Animation ─────────────────────────────────
@@ -2820,5 +3161,9 @@ window.addEventListener('mouseup', () => {
 
 resetLayoutBtn.addEventListener('click', resetLayout);
 </script>
+
+<div style="position:fixed; bottom:8px; left:12px; font-size:11px; color:#999; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; pointer-events:auto; z-index:5;">
+  Built on <a href="https://tnf-inc.github.io/metro-map-maker/" style="color:#6b9fce; text-decoration:none;" target="_blank" rel="noopener">Metro Map Maker</a> by tnf-inc (MIT License)
+</div>
 </body>
 </html>
