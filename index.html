@@ -416,6 +416,96 @@
   }
 
   .schema-hint:hover { text-decoration: underline; }
+
+  /* FAQ modal */
+  #faq-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #ccc;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  #faq-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+  #faq-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 400;
+    justify-content: center;
+    align-items: center;
+  }
+  #faq-overlay.open { display: flex; }
+
+  #faq-modal {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    width: 680px;
+    max-width: 92vw;
+    max-height: 85vh;
+    border-radius: 12px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .faq-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #333;
+    flex-shrink: 0;
+  }
+  .faq-header h2 { font-size: 16px; font-weight: 700; margin: 0; }
+
+  .faq-close {
+    background: none;
+    border: 1px solid #444;
+    color: #cdd6f4;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .faq-close:hover { background: #333; }
+
+  .faq-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px 28px;
+    scrollbar-width: thin;
+    scrollbar-color: #444 transparent;
+  }
+
+  .faq-item { margin-bottom: 24px; }
+  .faq-item:last-child { margin-bottom: 0; }
+  .faq-item h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #89b4fa;
+    margin: 0 0 8px;
+  }
+  .faq-item p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: #bac2de;
+    margin: 0;
+  }
+  .faq-item p a { color: #89b4fa; text-decoration: none; }
+  .faq-item p a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -465,6 +555,38 @@
     <div class="legend-item" data-line="teal">
       <div class="legend-swatch" style="background:#16a085;"></div>
       Requirements
+    </div>
+  </div>
+  <button id="faq-btn">FAQ</button>
+</div>
+
+<div id="faq-overlay">
+  <div id="faq-modal">
+    <div class="faq-header">
+      <h2>Frequently Asked Questions</h2>
+      <button class="faq-close" id="faq-close-btn">&times;</button>
+    </div>
+    <div class="faq-body">
+      <div class="faq-item">
+        <h3>What is CycloneDX?</h3>
+        <p><a href="https://cyclonedx.org/" target="_blank" rel="noopener">CycloneDX</a> is an open standard for describing what software, hardware, and services make up a product. Think of it as a machine-readable ingredient label for technology. It started as a way to list software components (an SBOM, or Software Bill of Materials) and has since expanded to cover vulnerabilities, licensing, cryptography, and as of version 2.0, threat modeling, risk management, and security controls.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is a BOM, and why does software need one?</h3>
+        <p>A Bill of Materials (BOM) is an inventory of everything that goes into a product. In manufacturing, it lists every part and raw material. In software, it lists every library, framework, service, and data asset. Organizations need SBOMs to track what they ship, respond quickly to newly discovered vulnerabilities (like Log4Shell), and meet regulatory requirements such as the US Executive Order on Cybersecurity and the EU Cyber Resilience Act.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is a TM-BOM, and how is it different from a regular SBOM?</h3>
+        <p>A traditional SBOM answers <em>"what components are in this software?"</em> A Threat Modeling BOM (TM-BOM) goes further and answers <em>"what can go wrong, how likely is it, and what are we doing about it?"</em> CycloneDX 2.0 introduces blueprints, threats, threat scenarios, risk ratings, controls, and requirements, all in the same machine-readable format. This means your threat model, risk register, and control catalog can live alongside your component inventory in a single, interlinked document.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How do I read this map?</h3>
+        <p><strong>Stations</strong> (dots and circles) represent schema objects, the building blocks of a CycloneDX 2.0 document. <strong>Hub stations</strong> (concentric circles) are major structural objects; click them to see their full schema definition. <strong>Solid lines</strong> show structural containment: objects that live together in the same part of the schema. <strong>Dashed lines</strong> show cross-references: where one object points to another by reference (bom-ref). Use the <strong>legend</strong> at the top to filter by domain, and hover over any station for a summary of its properties.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Who is this for?</h3>
+        <p>Anyone involved in securing software. <strong>Developers</strong> can see how their components connect to threats and controls. <strong>Security engineers</strong> can understand the full threat-model-to-mitigation pipeline. <strong>GRC and compliance teams</strong> can trace requirements through controls to the risks they address. <strong>Tool vendors</strong> can use the schema to build interoperable security tools. You don't need to be a security expert to explore the map. It's designed to make the CycloneDX 2.0 schema approachable for everyone.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -2456,7 +2578,17 @@ document.addEventListener('keydown', (keyEvent) => {
     closeSchemaPanel();
     keyEvent.stopPropagation();
   }
+  if (keyEvent.key === 'Escape' && faqOverlay.classList.contains('open')) {
+    faqOverlay.classList.remove('open');
+    keyEvent.stopPropagation();
+  }
 });
+
+// ─── FAQ Modal ──────────────────────────────────────
+const faqOverlay = document.getElementById('faq-overlay');
+document.getElementById('faq-btn').addEventListener('click', () => faqOverlay.classList.add('open'));
+document.getElementById('faq-close-btn').addEventListener('click', () => faqOverlay.classList.remove('open'));
+faqOverlay.addEventListener('click', (e) => { if (e.target === faqOverlay) faqOverlay.classList.remove('open'); });
 
 // ─── Route Animation ─────────────────────────────────
 const routePhases = [
