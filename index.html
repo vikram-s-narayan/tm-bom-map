@@ -831,28 +831,20 @@
       <polyline points="540,590 1220,540"
                 class="line-red" stroke-width="7"/>
 
-      <!-- Threat Scenario → Impact -->
-      <polyline points="540,590 1270,610"
-                class="line-red" stroke-width="7"/>
-
       <!-- ============================================ -->
       <!-- GRAY LINES — Risk Management                 -->
       <!-- ============================================ -->
 
-      <!-- Threat Scenario → Affected Assets (schema: threatScenario.affectedAssets) -->
+      <!-- Threat Scenario → Affects (schema: threatScenario.affects) -->
       <polyline points="540,590 700,700"
                 class="line-red" stroke-width="7"/>
 
-      <!-- Threat Scenario → Risk hub (gray dashed — bom-ref cross-reference via threatScenario.relatedRisks / risk.relatedThreats) -->
+      <!-- Threat Scenario → Risk hub (gray dashed — bom-ref cross-reference via risk.relatedThreats) -->
       <polyline points="540,590 900,750"
                 stroke="#6b6b6b" stroke-width="5" fill="none"
                 stroke-dasharray="16,8" opacity="0.6"
                 stroke-linecap="round" stroke-linejoin="round"
                 data-lines="red,gray"/>
-
-      <!-- Threat Scenario → Risk Score (schema: threatScenario.riskScore) -->
-      <polyline points="540,590 1010,720"
-                class="line-red" stroke-width="7"/>
 
       <!-- Threat Scenario → Risk Attributes (schema: threatScenario.riskAttributes) -->
       <polyline points="540,590 660,640"
@@ -873,6 +865,25 @@
       <!-- Risk hub → Risk Response -->
       <polyline points="900,750 1050,860"
                 class="line-gray" stroke-width="7"/>
+
+      <!-- Risk hub → Risk Score (schema: rating.score / assessment.overallRisk.score) -->
+      <polyline points="900,750 1010,720"
+                class="line-gray" stroke-width="7"/>
+
+      <!-- Risk hub → Damage Scenarios (peers in the 'risks' container, linked via risk.relatedDamageScenarios) -->
+      <polyline points="900,750 950,690 1150,660"
+                class="line-gray" stroke-width="7"/>
+
+      <!-- Damage Scenarios → Impact (schema: damageScenario.impacts) -->
+      <polyline points="1150,660 1270,610"
+                class="line-gray" stroke-width="7"/>
+
+      <!-- Threat Scenario → Damage Scenarios (red dashed — bom-ref cross-reference via threatScenario.damageScenarios) -->
+      <polyline points="540,590 1150,660"
+                stroke="#b7472a" stroke-width="2.5" fill="none"
+                stroke-dasharray="10,7" opacity="0.35"
+                stroke-linecap="round" stroke-linejoin="round"
+                data-lines="red,gray"/>
 
       <!-- Assessment → Risk hub (both are peers in the 'risks' container) -->
       <polyline points="900,750 780,870"
@@ -958,12 +969,12 @@
       <!-- Red terminals (Scenario Assessment — fan from Threat Scenario hub) -->
       <rect x="422" y="542" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Methodologies -->
       <rect x="1212" y="532" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Likelihood -->
-      <rect x="1262" y="602" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Impact -->
-      <rect x="692" y="692" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Affected Assets -->
-      <rect x="1002" y="712" width="10" height="16" rx="2" fill="#b7472a"/>  <!-- Risk Score -->
-      <rect x="652" y="632" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Risk Attributes -->
+      <rect x="1262" y="602" width="10" height="16" rx="2" fill="#6b6b6b"/>  <!-- Impact -->
+      <rect x="692" y="692" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Affects -->
+            <rect x="652" y="632" width="10" height="16" rx="2" fill="#b7472a"/>   <!-- Risk Attributes -->
 
       <!-- Gray terminals -->
+      <rect x="1002" y="712" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Risk Score -->
       <rect x="1002" y="752" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Inherent Risk -->
       <rect x="1002" y="792" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Residual Risk -->
       <rect x="1002" y="832" width="10" height="16" rx="2" fill="#6b6b6b"/> <!-- Target Risk -->
@@ -1189,7 +1200,7 @@
       </g>
       <g class="station-dot" data-station="impact">
         <circle class="hit-area" cx="1270" cy="610" r="20"/>
-        <circle cx="1270" cy="610" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
+        <circle cx="1270" cy="610" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
       </g>
 
       <!-- Scenario Assessment stations -->
@@ -1199,11 +1210,15 @@
       </g>
       <g class="station-dot" data-station="riskScore">
         <circle class="hit-area" cx="1010" cy="720" r="20"/>
-        <circle cx="1010" cy="720" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
+        <circle cx="1010" cy="720" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="riskAttributes">
         <circle class="hit-area" cx="660" cy="640" r="20"/>
         <circle cx="660" cy="640" r="6" fill="#fff" stroke="#b7472a" stroke-width="3" pointer-events="none"/>
+      </g>
+      <g class="station-dot" data-station="damageScenarios">
+        <circle class="hit-area" cx="1150" cy="660" r="20"/>
+        <circle cx="1150" cy="660" r="6" fill="#fff" stroke="#6b6b6b" stroke-width="3" pointer-events="none"/>
       </g>
       <g class="station-dot" data-station="inherentRisk">
         <circle class="hit-area" cx="1010" cy="760" r="20"/>
@@ -1429,20 +1444,23 @@
       </text>
       <text x="1345" y="485" text-anchor="start" class="station-label label-red">Exploitability</text>
       <text x="1235" y="535" text-anchor="start" class="station-label label-red">Likelihood</text>
-      <text x="1285" y="608" text-anchor="start" class="station-label label-red">Impact</text>
+      <text x="1285" y="608" text-anchor="start" class="station-label label-gray">Impact</text>
 
       <!-- Gray labels (Risk Management) -->
       <text x="680" y="685" text-anchor="middle" class="station-label label-red" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
-        <tspan x="680" dy="0">Affected</tspan>
-        <tspan x="680" dy="14">Assets</tspan>
+        <tspan x="680" dy="0">Affects</tspan>
       </text>
-      <text x="1025" y="715" text-anchor="start" class="station-label label-red">
+      <text x="1025" y="715" text-anchor="start" class="station-label label-gray">
         <tspan x="1025" dy="0">Risk</tspan>
         <tspan x="1025" dy="14">Score</tspan>
       </text>
       <text x="640" y="635" text-anchor="end" class="station-label label-red" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
         <tspan x="640" dy="0">Risk</tspan>
         <tspan x="640" dy="14">Attributes</tspan>
+      </text>
+      <text x="1150" y="684" text-anchor="middle" class="station-label label-gray" paint-order="stroke" stroke="#f4f3ee" stroke-width="4">
+        <tspan x="1150" dy="0">Damage</tspan>
+        <tspan x="1150" dy="14">Scenarios</tspan>
       </text>
       <text x="1025" y="755" text-anchor="start" class="station-label label-gray">
         <tspan x="1025" dy="0">Inherent</tspan>
@@ -1522,7 +1540,7 @@
                 stroke-linecap="round" stroke-linejoin="round"
                 data-lines="gray,cyan"/>
 
-      <!-- threat.affectedAssets — refs from threat to affected assets -->
+      <!-- threat.affects — refs from threat to affected assets -->
       <polyline points="620,360 660,530 700,700"
                 stroke="#3b2d8e" stroke-width="2.5" fill="none"
                 stroke-dasharray="10,7" opacity="0.35"
@@ -1709,17 +1727,17 @@ const stationData = {
     title: "Threats",
     line: "Hub — Threat Intelligence / Attack Modeling",
     color: "#222",
-    desc: "The top-level 'threats' object in the BOM — holds threats, scenarios, attack patterns, attack trees, abuse cases, trust boundaries, and methodologies. This is the threat model.",
-    props: ["threats", "scenarios", "attackPatterns", "attackTrees", "attackPaths", "abuseCases", "trustBoundaries", "methodologies"],
+    desc: "The top-level 'threats' object in the BOM — holds threats, threat scenarios, attack patterns, attack trees, abuse cases, trust boundaries, and methodologies. This is the threat model.",
+    props: ["threats", "threatScenarios", "attackPatterns", "attackTrees", "attackPaths", "abuseCases", "trustBoundaries", "methodologies"],
     example: "STRIDE analysis of the checkout flow covering payment, authentication, and order services",
     schemaEntry: {
       title: "Threats",
-      description: "Threat-modelling content, including the documented threats, the scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross.",
+      description: "Threat-modelling content, including the documented threats, the threat scenarios that realize them, the attack patterns and attack trees that describe how they are carried out, and the trust boundaries they cross. Control references throughout this model point at controls that mitigate the referencing element.",
       type: "object",
       properties: {
         threats: { title: "Threats", type: "array", description: "The documented threats. Each describes what can go wrong, independent of any specific actor or occurrence." },
-        scenarios: { title: "Scenarios", type: "array", description: "The threat scenarios, each realizing one or more documented threats in a specific way." },
-        attackPatterns: { title: "Attack Patterns", type: "array", description: "A library of attack patterns, typically aligned with CAPEC, that threats and scenarios can reference." },
+        threatScenarios: { title: "Threat Scenarios", type: "array", description: "The threat scenarios, each realizing one or more documented threats in a specific way." },
+        attackPatterns: { title: "Attack Patterns", type: "array", description: "A library of attack patterns, typically aligned with CAPEC, that threats and threat scenarios can reference." },
         attackTrees: { title: "Attack Trees", type: "array", description: "Attack trees that decompose attacker goals into sub-goals and techniques." },
         attackPaths: { title: "Attack Paths", type: "array", description: "Attack paths that describe the ordered progression of an attack across elements and trust boundaries, including lateral movement." },
         abuseCases: { title: "Abuse Cases", type: "array", description: "Abuse or misuse cases that describe how the system can be exercised by an adversary." },
@@ -1734,7 +1752,7 @@ const stationData = {
     line: "Hub — Intelligence / Attack Modeling",
     color: "#222",
     desc: "A documented threat describing what can go wrong, independent of any specific actor or occurrence. Hub connecting threat intelligence to attack modeling.",
-    props: ["bom-ref", "name", "description", "source", "origin", "categories", "weaknesses", "relatedVulnerabilities", "attackPatterns", "attackTrees", "abuseCases", "killChainPhase", "behaviors", "indicators", "affectedAssets", "relatedBusinessObjectives", "mitigations", "externalReferences", "properties"],
+    props: ["bom-ref", "name", "description", "source", "origin", "categories", "weaknesses", "relatedVulnerabilities", "attackPatterns", "attackTrees", "abuseCases", "killChainPhase", "behaviors", "indicators", "affects", "relatedBusinessObjectives", "mitigations", "externalReferences", "properties"],
     example: "SQL injection in product search allowing data exfiltration (STRIDE: Tampering, Information Disclosure)",
     schemaEntry: {
       title: "Threat",
@@ -1756,7 +1774,7 @@ const stationData = {
         killChainPhase: { description: "The kill chain phase at which this threat operates.", $ref: "cyclonedx-threat-2.0/killChainPhase", enum: ["reconnaissance","weaponization","delivery","exploitation","installation","command-and-control","actions-on-objectives"] },
         behaviors: { title: "Behaviors", type: "array", description: "References (bom-ref/bom-link) to declared behaviors that constitute the intent of this threat." },
         indicators: { description: "Indicators of compromise (IoC), indicators of attack (IoA), and detection signatures.", $ref: "cyclonedx-threat-2.0/indicators" },
-        affectedAssets: { title: "Affected Assets", type: "array", description: "References (bom-ref/bom-link) to the kinds of assets this threat affects." },
+        affects: { title: "Affects", type: "array", description: "References using bom-link or bom-ref to the assets that this threat can affect." },
         relatedBusinessObjectives: { type: "array", description: "References (bom-ref/bom-link) to business objectives this threat endangers." },
         mitigations: { title: "Mitigations", type: "array", description: "References (bom-ref/bom-link) to controls that mitigate this threat." },
         externalReferences: { $ref: "cyclonedx-common-2.0/externalReferences" },
@@ -1851,7 +1869,7 @@ const stationData = {
     line: "Hub — System Model / AI Model Card",
     color: "#222",
     desc: "Top-level BOM inventory of software, hardware, and ML model components — libraries, frameworks, applications, containers, devices, firmware, and machine-learning-models. Hub connecting the system model (cyan) to AI/ML model cards (magenta). Components of type machine-learning-model carry a modelCard object. Components of type service carry endpoints (URI array) and dataProfiles.",
-    props: ["type (application | framework | library | container | platform | operating-system | device | device-driver | firmware | file | machine-learning-model | data | cryptographic-asset | material | service)", "bom-ref", "name", "version", "description", "group", "scope", "parties", "origins", "hashes", "licenses", "identifiers", "pedigree", "components", "evidence", "modelCard", "endpoints (service only)", "dataProfiles (service only)", "releaseNotes", "tags", "properties", "externalReferences"],
+    props: ["type (application | framework | library | container | platform | operating-system | device | device-driver | firmware | file | machine-learning-model | data | cryptographic-asset | material | service)", "bom-ref", "name", "version", "description", "group", "scope", "parties", "origins", "hashes", "licenses", "identifiers", "pedigree", "components", "evidence", "modelCard", "endpoints (service only)", "dataProfiles (service only)", "releaseNotes", "certifications", "mediaType", "tags", "properties", "externalReferences"],
     example: "Express.js v4.18.2 (library); PostgreSQL v15 (application); GPT-4-turbo (machine-learning-model, with modelCard); Stripe API (service, endpoints: [https://api.stripe.com/v1])",
     schemaEntry: {
       title: "Component",
@@ -1860,7 +1878,7 @@ const stationData = {
       required: ["type", "name"],
       properties: {
         type: { title: "Component Type", description: "Specifies the type of component.", enum: ["application","framework","library","container","platform","operating-system","device","device-driver","firmware","file","machine-learning-model","data","cryptographic-asset","material","service"] },
-        "mime-type": { title: "Mime-Type", type: "string", description: "The mime-type of the component. When used on file components, provides additional context about the kind of file." },
+        mediaType: { $ref: "cyclonedx-common-2.0/mediaType" },
         "bom-ref": { description: "An identifier which can be used to reference the component elsewhere in the BOM.", $ref: "cyclonedx-common-2.0/refType" },
         parties: { description: "The parties associated with the component.", $ref: "cyclonedx-party-2.0/parties" },
         origins: { title: "Component Origins", type: "array", description: "The geographic origins of the component, each expressed as a distribution across one or more countries or subdivisions." },
@@ -1875,13 +1893,14 @@ const stationData = {
         licenses: { title: "Component License(s)", $ref: "cyclonedx-license-2.0/licenseChoice" },
         copyright: { $ref: "cyclonedx-component-2.0/copyrightText" },
         identifiers: { $ref: "cyclonedx-component-2.0/identifiers" },
-        pedigree: { title: "Component Pedigree", type: "object", description: "Documents complex supply chain scenarios — ancestors, descendants, variants, commits, and patches." },
-        components: { title: "Components", type: "array", description: "A list of components included in the parent component. Provides a way to specify a hierarchical representation of component assemblies." },
+        pedigree: { title: "Component Pedigree", type: "object", description: "Documents complex supply chain scenarios — ancestors, descendants, variants, commits, and patches. Ancestors, descendants, and variants may be inline components or references to components declared elsewhere." },
+        components: { title: "Components", type: "array", description: "A list of entries included in the parent component, including software, hardware, and services. Entries may be concrete components, references to components declared elsewhere, or component-choice wrappers expressing conditional or alternate relationships. Provides a way to specify a hierarchical representation of component assemblies." },
         evidence: { title: "Evidence", description: "Evidence collected through various forms of extraction or analysis.", $ref: "cyclonedx-component-2.0/componentEvidence" },
         modelCard: { title: "AI/ML Model Card", description: "AI/ML model card. Applicable only to components of type machine-learning-model.", $ref: "cyclonedx-ai-modelcard-2.0/modelCard" },
         endpoints: { title: "Endpoints", type: "array", description: "The endpoint URIs of the service. May only be used for components of type service." },
         dataProfiles: { title: "Data Profiles", type: "array", description: "The data handled by the service, characterized by data profiles. May only be used for components of type service." },
-        releaseNotes: { title: "Release Notes", $ref: "cyclonedx-release-notes-2.0/releaseNotes" },
+        releaseNotes: { title: "Release Notes", description: "The release notes for the component. Either inline release notes or a reference using bom-link or bom-ref to release notes defined elsewhere, such as in the definitions.", oneOf: ["cyclonedx-release-notes-2.0/releaseNotes", "cyclonedx-release-notes-2.0/releaseNotesReference"] },
+        certifications: { title: "Certifications", type: "array", description: "Certifications held by or applicable to the component. Each entry is either an inline certification or a reference using bom-link or bom-ref to a certification defined elsewhere, such as in the definitions." },
         tags: { title: "Tags", $ref: "cyclonedx-common-2.0/tags" },
         properties: { $ref: "cyclonedx-common-2.0/properties" },
         externalReferences: { $ref: "cyclonedx-common-2.0/externalReferences" }
@@ -1901,7 +1920,7 @@ const stationData = {
     line: "System Model",
     color: "#2980b9",
     desc: "Blueprint asset inventory — components, services, and data stores that comprise the system under analysis, with zone placement, interfaces, and authorization.",
-    props: ["bom-ref", "componentRef", "partyRef", "type", "name", "description", "zone", "classification", "tags", "responsibilities", "interfaces", "useCases", "authentication", "authorization", "ownership", "properties", "externalReferences"],
+    props: ["bom-ref", "componentRef", "partyRef", "type", "name", "description", "zone", "classification (incl. riskAttributes, safetyIntegrityLevels)", "inScope", "tags", "responsibilities", "interfaces", "useCases", "authentication", "authorization", "ownership", "properties", "externalReferences"],
     example: "PostgreSQL user database containing PII for 2M customers; Payment Service (Node.js microservice)"
   },
   dataStores: {
@@ -1909,7 +1928,7 @@ const stationData = {
     line: "System Model",
     color: "#2980b9",
     desc: "Storage systems within the blueprint — databases, file systems, caches — with technology details, zone placement, and linked data sets.",
-    props: ["bom-ref", "name", "description", "type", "vendor", "product", "version", "environment", "zone", "location", "technologies", "dataSets", "authorization", "properties"],
+    props: ["bom-ref", "name", "description", "type", "vendor", "product", "version", "environment", "zone", "location", "technologies", "dataSets", "authorization", "inScope", "properties"],
     example: "Amazon RDS (PostgreSQL) — stores customer profiles, orders, and payment tokens; Redis cache for sessions"
   },
   dataSets: {
@@ -1917,7 +1936,7 @@ const stationData = {
     line: "System Model",
     color: "#2980b9",
     desc: "Named data collections distinct from storage — with data profiles, data objects, record counts, ownership, and placement in data stores.",
-    props: ["bom-ref", "name", "description", "dataProfiles", "dataObjects", "recordCount", "owners", "authorization", "placements", "properties"],
+    props: ["bom-ref", "name", "description", "dataProfiles", "dataObjects", "recordCount", "owners", "authorization", "placements", "inScope", "properties"],
     example: "Customer PII dataset — names, emails, addresses, phone numbers (classified: Confidential, retention: 7 years)"
   },
   visualizations: {
@@ -1941,7 +1960,7 @@ const stationData = {
     line: "System Model",
     color: "#2980b9",
     desc: "Trust and network zones that partition the system architecture into distinct security domains, with type, parent hierarchy, and constraints.",
-    props: ["bom-ref", "name", "description", "type", "parent", "characteristics", "constraints", "properties"],
+    props: ["bom-ref", "name", "description", "type", "parent", "characteristics", "constraints", "inScope", "properties"],
     example: "DMZ — public-facing web servers and load balancers (trust level: Low); Internal — microservices and databases (trust level: High)"
   },
   boundaries: {
@@ -1949,7 +1968,7 @@ const stationData = {
     line: "System Model",
     color: "#2980b9",
     desc: "Zone boundaries where data or control crosses between trust levels — defines the zones involved, crossing requirements, and session management.",
-    props: ["bom-ref", "name", "type", "zones", "crossingRequirements", "sessionManagement", "properties"],
+    props: ["bom-ref", "name", "type", "zones", "crossingRequirements", "sessionManagement", "inScope", "properties"],
     example: "BOUNDARY-01: type: network, zones: [DMZ, Internal], crossingRequirements: mTLS, input validation, rate limiting, session management: stateless JWT"
   },
   flows: {
@@ -1957,7 +1976,7 @@ const stationData = {
     line: "System Model",
     color: "#2980b9",
     desc: "Data and control flows between assets — typed, directional communication paths with protocol, encryption, and data profile details.",
-    props: ["bom-ref", "name", "description", "type", "source", "destination", "bidirectional", "synchronous", "encrypted", "volume", "timing", "protocols", "dataProfiles", "dataObjects", "authentication", "authorization", "sequence", "properties"],
+    props: ["bom-ref", "name", "description", "type", "source", "destination", "bidirectional", "synchronous", "encrypted", "volume", "timing", "protocols", "dataProfiles", "dataObjects", "authentication", "authorization", "sequence", "inScope", "properties"],
     example: "HTTPS POST /api/checkout → Payment Service → Stripe API (carries PCI card data, crosses DMZ→Internal boundary)"
   },
   useCases: {
@@ -1997,7 +2016,7 @@ const stationData = {
     line: "System Model",
     color: "#2980b9",
     desc: "System-level actor definitions within the blueprint — each references a party (person, system, or organization) and specifies their zone, permissions, and role in the architecture.",
-    props: ["bom-ref", "party (ref or inline)", "description", "permissions", "zone", "properties"],
+    props: ["bom-ref", "party (ref or inline)", "description", "permissions", "zone", "inScope", "properties"],
     example: "Authenticated Customer — web/mobile access, limited to own account data; Admin — internal zone, full CRUD"
   },
 
@@ -2081,7 +2100,7 @@ const stationData = {
     line: "Threat Intelligence",
     color: "#3b2d8e",
     desc: "Chained multi-step attack sequences with an objective and actor. Each step carries technique, attack pattern, kill chain phase, source, destination, and boundary crossings.",
-    props: ["bom-ref", "name", "description", "objective", "actor", "steps (each: technique { id, name, tactic, procedure }, attackPattern, killChainPhase, source, destination, boundaryCrossed, exploits, mitigations)", "realizes", "relatedRisks", "externalReferences", "properties"],
+    props: ["bom-ref", "name", "description", "objective", "actor", "steps (each: technique { id, name, tactic, procedure }, attackPattern, killChainPhase, source, destination, boundaryCrossed, exploits, mitigations)", "realizes", "externalReferences", "properties"],
     example: "SQLi in search → extract DB credentials → direct DB connection → bulk PII exfiltration (crosses DMZ→Internal)"
   },
   trustBoundaries: {
@@ -2130,26 +2149,27 @@ const stationData = {
     title: "Exploitability",
     line: "Scenarios",
     color: "#b7472a",
-    desc: "Maturity and feasibility of exploiting the threat — from theoretical to weaponized.",
-    props: ["level", "complexity", "skillRequired", "automatable"],
-    example: "Weaponized — public exploit available (sqlmap), fully automatable, low skill required"
+    desc: "The degree to which a threat can be exploited in practice. The level uses the same exploit-maturity scale as vulnerabilities.",
+    props: ["level (not-defined | unreported | proof-of-concept | functional | active)", "complexity (trivial → very-high)", "skillRequired (none → expert)", "automatable"],
+    example: "Active — public exploit available (sqlmap), complexity: trivial, skillRequired: basic, automatable: true"
   },
   threatScenario: {
     title: "Threat Scenario",
     line: "Hub — Attack Modeling / Scenario Assessment",
     color: "#222",
-    desc: "A specific realization of a threat, in which an actor seeks to cause harm. References the threat it realizes and carries the scenario-specific assessment (likelihood, impact, risk score). Hub linking threat modeling to scenario assessment (red).",
-    props: ["bom-ref", "name", "description", "threats", "actor", "threatProfile", "motivation", "intent", "accessLevel", "attackVector", "exploitability", "likelihood", "impact", "riskScore", "riskAttributes", "affectedAssets", "relatedRisks", "relatedVulnerabilities", "externalReferences", "properties"],
+    desc: "A specific realization of a threat, in which an actor seeks to cause harm. References the threat it realizes and carries the scenario-specific traits and likelihood. The consequence is expressed by the damage scenarios it leads to, and the resulting risk is documented under risks, referencing both. Hub linking threat modeling to scenario assessment (red).",
+    props: ["bom-ref", "name", "description", "event", "threats", "actor", "threatProfile", "motivation", "intent", "accessLevel", "attackVector", "exploitability", "likelihood", "riskAttributes", "affects", "damageScenarios", "relatedVulnerabilities", "externalReferences", "properties"],
     example: "External attacker exploits SQL injection in product search to extract 2M customer PII records via blind injection",
     schemaEntry: {
       title: "Threat Scenario",
-      description: "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threat it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits and risk assessment, such as motivation, intent, access level, likelihood, and impact.",
+      description: "A specific realization of a threat, in which an actor seeks to cause harm. The scenario references the threats it realizes, supplies the actor by reference to a party, and carries the scenario-specific traits, such as motivation, intent, access level, and likelihood. The consequence is expressed by the damage scenarios it leads to, and the resulting risk is documented under risks, referencing both.",
       type: "object",
       required: ["bom-ref", "name", "threats"],
       properties: {
         "bom-ref": { description: "An identifier which can be used to reference the threat scenario elsewhere using a bom-ref or bom-link.", $ref: "cyclonedx-common-2.0/refType" },
         name: { title: "Name", type: "string", description: "The name of the threat scenario." },
         description: { title: "Description", type: "string", description: "A description of the threat scenario." },
+        event: { title: "Event", type: "string", description: "The event that realizes or triggers the threat in this scenario." },
         threats: { title: "Threats", type: "array", description: "References using bom-link or bom-ref to the threats that this scenario realizes. A scenario realizes one or more threats." },
         actor: { description: "Reference using bom-link or bom-ref to the party that is the actor in this scenario. Named adversary groups are organizations and abstract attacker classes are personas.", $ref: "cyclonedx-common-2.0/refLinkType" },
         threatProfile: { description: "Reference using bom-link or bom-ref to a reusable threat profile that describes the durable capabilities of the actor.", $ref: "cyclonedx-common-2.0/refLinkType" },
@@ -2158,12 +2178,10 @@ const stationData = {
         accessLevel: { title: "Access Level", description: "The level of access the actor is assumed to have in this scenario.", enum: ["none","external","internal","privileged","physical"] },
         attackVector: { description: "The attack vector for this scenario.", $ref: "cyclonedx-threat-2.0/attackVector" },
         exploitability: { description: "The exploitability assessment for this scenario.", $ref: "cyclonedx-threat-2.0/exploitability" },
-        likelihood: { description: "Probability assessment of the scenario occurring.", $ref: "cyclonedx-risk-2.0/likelihood" },
-        impact: { description: "Severity of consequences if the scenario materializes.", $ref: "cyclonedx-risk-2.0/impact" },
-        riskScore: { description: "Quantified risk rating on the threat scenario using a chosen methodology.", $ref: "cyclonedx-risk-2.0/riskScore" },
+        likelihood: { description: "The likelihood that this scenario is realized, which in attack terms is its feasibility. The consequence is carried by the damage scenarios the scenario leads to, and the paired rating by the risk that references both.", $ref: "cyclonedx-risk-2.0/likelihood" },
         riskAttributes: { title: "Risk Attributes", type: "array", description: "The security and privacy attributes that this threat would compromise if realized." },
-        affectedAssets: { title: "Affected Assets", type: "array", description: "References using bom-link or bom-ref to the assets affected in this scenario." },
-        relatedRisks: { title: "Related Risks", type: "array", description: "References using bom-link or bom-ref to the risks that this scenario contributes to." },
+        affects: { title: "Affects", type: "array", description: "References using bom-link or bom-ref to the assets affected in this scenario." },
+        damageScenarios: { title: "Damage Scenarios", type: "array", description: "References using bom-link or bom-ref to the damage scenarios, declared under the risks collection, that this scenario can lead to." },
         relatedVulnerabilities: { type: "array", description: "References using bom-link or bom-ref to the vulnerabilities exploited in this scenario." },
         externalReferences: { $ref: "cyclonedx-common-2.0/externalReferences" },
         properties: { $ref: "cyclonedx-common-2.0/properties" }
@@ -2182,8 +2200,8 @@ const stationData = {
     title: "Impact",
     line: "Scenario Assessment",
     color: "#b7472a",
-    desc: "Severity of consequences if the scenario materializes. Categories cover the CIA triad and beyond (financial, operational, reputational, regulatory, safety, privacy). Quantification captures financial loss, affected users, downtime, and other measurable metrics.",
-    props: ["level", "polarity", "score", "categories (each: category, level, score, justification)", "factors", "range", "quantification (financialLoss, affectedUsers, downtime, dataRecords, ...)", "description"],
+    desc: "Severity of consequences. No longer a threat scenario property — impact is carried by a damage scenario (one entry per impact category) and by the impact axis of a risk rating. Categories cover the CIA triad and beyond (financial, operational, reputational, regulatory, safety, privacy). Quantification captures financial loss, affected users, downtime, and other measurable metrics.",
+    props: ["level", "polarity", "score", "methodology", "categories (each: category, level, score, justification)", "riskAttributes", "factors", "range", "quantification (financialLoss, affectedUsers, downtime, dataRecords, ...)", "description"],
     example: "Critical — 2M customer records exposed, estimated $4.5M regulatory fines, severe reputational damage"
   },
 
@@ -2197,10 +2215,10 @@ const stationData = {
     example: "confidentiality, integrity — a SQL injection compromises data confidentiality and integrity"
   },
   affectedAssets: {
-    title: "Affected Assets",
+    title: "Affects",
     line: "Scenario Assessment",
     color: "#b7472a",
-    desc: "References to the assets affected. A property of both threat and threatScenario (shown here on Threat Scenario; a dashed cross-reference connects from Threat as well).",
+    desc: "References to the assets affected (the 'affects' property, formerly affectedAssets). A property of both threat and threatScenario (shown here on Threat Scenario; a dashed cross-reference connects from Threat as well).",
     props: ["bom-ref links to components", "bom-ref links to services", "bom-ref links to data stores"],
     example: "User database (PostgreSQL), Search Service API, Customer PII dataset"
   },
@@ -2209,7 +2227,7 @@ const stationData = {
     line: "Hub — Risk / Controls",
     color: "#222",
     desc: "The formal risk object connecting risk ratings to responses and controls. Domains classify the risk (e.g. operational, financial, regulatory, reputational, safety, privacy). Has bom-ref cross-references back to threats, vulnerabilities, weaknesses, requirements, standards, claims, business objectives, and affected subjects.",
-    props: ["bom-ref", "name", "statement", "description", "domains", "affects", "relatedThreats", "relatedVulnerabilities", "relatedWeaknesses", "relatedRequirements", "relatedStandards", "relatedClaims", "relatedBusinessObjectives", "inherentRisk", "residualRisk", "targetRisk", "responses", "status", "owner", "properties"],
+    props: ["bom-ref", "name", "statement", "description", "domains", "affects", "relatedThreats", "relatedVulnerabilities", "relatedWeaknesses", "relatedRequirements", "relatedStandards", "relatedClaims", "relatedBusinessObjectives", "relatedBehaviors", "relatedDamageScenarios", "inherentRisk", "residualRisk", "targetRisk", "responses", "status", "owner", "properties"],
     example: "RISK-007: Customer data breach via SQL injection — Inherent: Critical, Residual: Medium, Target: Low",
     schemaEntry: {
       title: "Risk",
@@ -2230,11 +2248,13 @@ const stationData = {
         relatedStandards: { type: "array", description: "References using bom-link or bom-ref to the standards whose non-conformance gives rise to this risk." },
         relatedClaims: { type: "array", description: "References using bom-link or bom-ref to the conformance claims that give rise to this risk." },
         relatedBusinessObjectives: { type: "array", description: "References using bom-link or bom-ref to the business objectives this risk threatens." },
+        relatedBehaviors: { type: "array", description: "References using bom-link or bom-ref to the declared or observed behaviours that inform this risk. Any behaviour can give rise to a risk depending on context and expectation, for example an observed behaviour that defeats a declared safety behaviour." },
+        relatedDamageScenarios: { type: "array", description: "References using bom-link or bom-ref to the damage scenarios that this risk realizes. A risk typically pairs a threat scenario, which supplies the likelihood, with a damage scenario, which supplies the impact." },
         inherentRisk: { description: "The assessed risk before any responses are applied.", $ref: "cyclonedx-risk-2.0/rating" },
         residualRisk: { description: "The assessed risk remaining after responses are applied.", $ref: "cyclonedx-risk-2.0/rating" },
         targetRisk: { description: "The risk level the organization aims to reach for this risk.", $ref: "cyclonedx-risk-2.0/rating" },
         responses: { type: "array", description: "The responses applied to this risk.", $ref: "cyclonedx-risk-2.0/riskResponse" },
-        status: { title: "Status", description: "The lifecycle status of the risk.", enum: ["identified","assessed","mitigated","accepted","transferred","retired"] },
+        status: { title: "Status", description: "The lifecycle status of the risk. The status tracks progress through the risk process; the disposition chosen, such as reduce, share, or accept, is recorded on the responses. oneOf: enum or custom { name, description }.", enum: ["identified","assessed","treated","monitored","retired"] },
         owner: { description: "The party accountable for this risk.", $ref: "cyclonedx-party-2.0/partyChoice" },
         properties: { $ref: "cyclonedx-common-2.0/properties" }
       }
@@ -2244,16 +2264,24 @@ const stationData = {
     title: "Risk Score",
     line: "Scenario Assessment",
     color: "#b7472a",
-    desc: "Quantified risk rating on the threat scenario using a chosen methodology. A property of threatScenario only — the risk object uses separate inherentRisk/residualRisk/targetRisk rating objects instead.",
-    props: ["level (info → critical)", "score", "vector", "methodology (DREAD, FAIR, OWASP, etc.)"],
+    desc: "The overall risk score — a qualitative level, a numeric score, or both, with vector and methodology recording how it was derived. Used as the score of a risk rating (inherentRisk / residualRisk / targetRisk) and as an assessment's overallRisk score; no longer a property of threatScenario.",
+    props: ["level (negligible | low | medium | high | critical)", "score", "vector", "methodology (dread | fair | fmea | nist-sp-800-30 | octave | owasp-risk-rating | qualitative-matrix | custom)"],
     example: "OWASP Risk Rating: Critical (Likelihood: High x Impact: Critical = 9.2/10)"
+  },
+  damageScenarios: {
+    title: "Damage Scenarios",
+    line: "Risk Management",
+    color: "#6b6b6b",
+    desc: "An adverse consequence for one or more subjects, described independently of the threat or event that could cause it. Declared in the top-level 'risks' container, referenced from threatScenario.damageScenarios and risk.relatedDamageScenarios. Carries an impact per category so the same consequence can be paired with several causes — in ISO/SAE 21434 terms the damage scenario is the harm, the threat scenario is the cause, and the risk pairs the two.",
+    props: ["bom-ref", "name", "description", "affects", "impacts (one impact per category)", "externalReferences", "properties"],
+    example: "DS-03: Customer PII disclosed publicly — affects: [customer-pii-dataset, customers]; impacts: privacy: severe, financial: major ($4.5M regulatory fines), reputational: major"
   },
   inherentRisk: {
     title: "Inherent Risk",
     line: "Risk Management",
     color: "#6b6b6b",
-    desc: "Pre-control risk rating — the risk level before any mitigating controls are applied. Uses the 'rating' object type, distinct from threatScenario.riskScore.",
-    props: ["likelihood", "impact", "score", "detectability", "confidence", "rationale"],
+    desc: "Pre-control risk rating — the risk level before any mitigating controls are applied. Uses the 'rating' object type, whose score is a riskScore.",
+    props: ["likelihood", "impact", "score (riskScore)", "detectability", "controllability", "confidence", "rationale"],
     example: "Critical (9.2) — before parameterized queries, WAF, or input validation are deployed"
   },
   residualRisk: {
@@ -2261,7 +2289,7 @@ const stationData = {
     line: "Risk Management",
     color: "#6b6b6b",
     desc: "Post-control risk rating — the risk level remaining after mitigating controls are applied. Same 'rating' object type as inherent and target risk.",
-    props: ["likelihood", "impact", "score", "detectability", "confidence", "rationale"],
+    props: ["likelihood", "impact", "score (riskScore)", "detectability", "controllability", "confidence", "rationale"],
     example: "Medium (4.1) — after WAF rules and parameterized queries applied; stored procedures still uncovered"
   },
   targetRisk: {
@@ -2269,15 +2297,15 @@ const stationData = {
     line: "Risk Management",
     color: "#6b6b6b",
     desc: "The desired risk level after planned controls are fully implemented — the third tier of the risk rating model alongside inherent and residual risk. Same 'rating' object type.",
-    props: ["likelihood", "impact", "score", "detectability", "confidence", "rationale"],
+    props: ["likelihood", "impact", "score (riskScore)", "detectability", "controllability", "confidence", "rationale"],
     example: "Low (2.0) — target after adding runtime SQL monitoring, input fuzzing, and stored procedure migration"
   },
   riskResponse: {
     title: "Risk Response",
     line: "Risk Management",
     color: "#6b6b6b",
-    desc: "Strategy for addressing identified risk — avoid, reduce, transfer, accept, exploit, or enhance — with linked controls. Exploit and enhance cover positive risk (opportunity).",
-    props: ["bom-ref", "strategy (avoid | reduce | transfer | accept | exploit | enhance)", "description", "controls", "status", "effectiveness", "cost", "priority", "owner", "targetDate", "addresses", "externalReferences", "properties"],
+    desc: "Strategy for addressing identified risk — avoid, reduce, share, accept, exploit, or enhance — with linked controls. Share (called transfer in some frameworks) covers insurance, contract, or outsourcing. Exploit and enhance cover positive risk (opportunity).",
+    props: ["bom-ref", "strategy (avoid | reduce | share | accept | exploit | enhance)", "description", "controls", "status", "effectiveness", "cost", "priority", "owner", "targetDate", "addresses", "externalReferences", "properties"],
     example: "Reduce — deploy parameterized queries (Sprint 12), WAF rules (Sprint 13), runtime SQL monitoring (Sprint 15)"
   },
   assessment: {
@@ -2285,7 +2313,7 @@ const stationData = {
     line: "Risk Management",
     color: "#6b6b6b",
     desc: "Point-in-time risk assessment event. A peer of risks inside the top-level 'risks' container — not a property of individual risk objects. References risks via bom-ref and computes an overallRisk score.",
-    props: ["bom-ref", "name", "type", "cadence", "timestamp", "scope", "status", "assessors", "summary", "risks", "overallRisk", "assumptions", "recommendations", "nextReview", "riskAppetites", "externalReferences", "properties"],
+    props: ["bom-ref", "name", "type", "cadence", "triggeredBy", "timestamp", "scope", "status", "assessors", "summary", "risks", "overallRisk", "conclusion (acceptable | unacceptable | inconclusive | custom)", "assumptions", "recommendations", "nextReview", "riskAppetites", "externalReferences", "properties"],
     example: "Q3 2026 Application Security Review — scope: all public-facing APIs; finding: 3 SQLi vectors in search service"
   },
 
@@ -2643,18 +2671,18 @@ const routePhases = [
   {
     phaseNumber: 7,
     title: "Build Scenarios",
-    desc: "Concrete threat scenarios — actors, vectors, exploitability, likelihood, impact",
+    desc: "Concrete threat scenarios — actors, vectors, exploitability, likelihood, affected assets",
     color: "#b7472a",
     waypoints: [[620,360],[580,420],[540,490],[540,590]],
-    branchStations: ["actor","threatProfile","attackVector","exploitability","methodologies","likelihood","impact","riskScore","riskAttributes"]
+    branchStations: ["actor","threatProfile","attackVector","exploitability","methodologies","likelihood","riskAttributes"]
   },
   {
     phaseNumber: 8,
     title: "Assess the Risk",
-    desc: "Risk ratings — inherent, residual, and target risk with formal assessment",
+    desc: "Damage scenarios and their impact, risk ratings — inherent, residual, and target risk with formal assessment",
     color: "#6b6b6b",
     waypoints: [[540,590],[640,660],[780,720],[900,750]],
-    branchStations: ["inherentRisk","residualRisk","targetRisk","assessment"]
+    branchStations: ["damageScenarios","impact","riskScore","inherentRisk","residualRisk","targetRisk","assessment"]
   },
   {
     phaseNumber: 9,
@@ -3108,11 +3136,11 @@ const lineFilterMap = {
     hubs: ['blueprint', 'components']
   },
   red: {
-    stations: ['actor', 'threatProfile', 'attackVector', 'exploitability', 'methodologies', 'likelihood', 'impact', 'riskScore', 'affectedAssets', 'riskAttributes'],
+    stations: ['actor', 'threatProfile', 'attackVector', 'exploitability', 'methodologies', 'likelihood', 'affectedAssets', 'riskAttributes'],
     hubs: ['threat', 'threatScenario']
   },
   gray: {
-    stations: ['inherentRisk', 'residualRisk', 'targetRisk', 'riskResponse', 'assessment', 'riskAppetite'],
+    stations: ['riskScore', 'damageScenarios', 'impact', 'inherentRisk', 'residualRisk', 'targetRisk', 'riskResponse', 'assessment', 'riskAppetite'],
     hubs: ['threatScenario', 'risk']
   },
   green: {
